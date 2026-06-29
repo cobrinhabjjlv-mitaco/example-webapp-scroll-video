@@ -139,7 +139,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const TARGET_W = 1280;
 
   function getFit() {
-    return window.innerWidth > 1024 ? 'cover' : 'contain';
+    // Always use cover so the square video fills the full screen on
+    // both desktop and mobile — no black bars on any device.
+    return 'cover';
   }
 
   function initScrollVideo(container) {
