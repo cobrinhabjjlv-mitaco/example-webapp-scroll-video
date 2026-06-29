@@ -40,6 +40,54 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 1000);
   }, 3000);
 
+  let isSecondHalfTriggered = false;
+  let cancelCurrentScroll = null;
+
+  function autoScrollSegment(startPixel, endPixel, durationMs, onComplete) {
+    const startTime = performance.now();
+    let canceled = false;
+    
+    // Allow cancelling a running animation
+    cancelCurrentScroll = () => { canceled = true; };
+
+    function step(currentTime) {
+      if (canceled) return;
+      
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / durationMs, 1);
+      const currentY = startPixel + (endPixel - startPixel) * progress;
+      
+      window.scrollTo(0, currentY);
+
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      } else if (onComplete) {
+        onComplete();
+      }
+    }
+    
+    requestAnimationFrame(step);
+  }
+
+  function triggerFinalScroll() {
+    if (isSecondHalfTriggered) return;
+    isSecondHalfTriggered = true;
+
+    // Stop Phase 1 if it's still running
+    if (cancelCurrentScroll) cancelCurrentScroll();
+
+    // Hide CTA temporarily if it was visible
+    document.getElementById('bottom-cta').classList.remove('active');
+
+    const currentPos = window.scrollY;
+    const finalTarget = document.body.scrollHeight - window.innerHeight;
+
+    autoScrollSegment(currentPos, finalTarget, 10000, () => {
+      document.body.style.overflow = ''; // Finally unlock scroll
+      document.getElementById('bottom-cta').classList.add('active'); // Show final CTA
+    });
+  }
+
   function dismissModal() {
     // 1. Fade out modal over 1.5s
     modal.style.transition = 'opacity 1.5s ease';
@@ -64,8 +112,12 @@ document.addEventListener('DOMContentLoaded', () => {
         welcomeBanner.style.transition = 'opacity 0.7s ease';
         welcomeBanner.style.opacity = '0';
         
-        // 4. At the exact same time, start the auto-scroll
-        autoScrollToBottom(10000);
+        // 4. Start Phase 1 of the scroll animation
+        autoScrollSegment(window.scrollY, 1480, 50000, () => {
+          console.log("Paused at 1480px. Scroll remains locked.");
+          // Show the button so the user can interact and trigger Phase 2
+          document.getElementById('bottom-cta').classList.add('active');
+        });
         
         setTimeout(() => {
           welcomeBanner.style.display = 'none';
@@ -73,31 +125,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }, 1500 + 1000); // 1.5s fade in + 1s read time
       
     }, 1500);
-  }
-
-  function autoScrollToBottom(durationMs) {
-    // Determine how far down we need to scroll
-    const targetY = document.body.scrollHeight - window.innerHeight;
-    const startY = window.scrollY;
-    const startTime = performance.now();
-
-    function step(currentTime) {
-      const elapsed = currentTime - startTime;
-      const progress = Math.min(elapsed / durationMs, 1);
-      
-      // Linear progress keeps video playback steady
-      const currentY = startY + (targetY - startY) * progress;
-      window.scrollTo(0, currentY);
-
-      if (progress < 1) {
-        requestAnimationFrame(step);
-      } else {
-        // Unlock scroll at the very end so they can scroll back up
-        document.body.style.overflow = '';
-      }
-    }
-    
-    requestAnimationFrame(step);
   }
 
   // Handle lead form submission
@@ -125,12 +152,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Handle "Maybe Later"
   btnLater.addEventListener('click', () => {
+    // We dismiss the modal, which eventually triggers Phase 1
     dismissModal();
+    // (We do not triggerFinalScroll here, otherwise it skips Phase 1 entirely)
   });
 
-  // Handle CTA button
-  btnWholesale.addEventListener('click', () => {
-    window.location.href = '/wholesale';
+  btnWholesale.addEventListener('click', (e) => {
+    if (!isSecondHalfTriggered) {
+      e.preventDefault();
+      // If clicked while paused at 1480px, it resumes Phase 2!
+      triggerFinalScroll();
+    } else {
+      // If Phase 2 is done, clicking it navigates to the wholesale page
+      window.location.href = '/wholesale';
+    }
   });
 
   // ============================================
@@ -185,8 +220,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let total = 0;
 
     function syncSpacerHeight() {
-      // Create a virtual height for scrolling
-      spacer.style.height = (window.innerHeight * 5) + 'px'; 
+      // Must be tall enough for Phase 1 to reach the 1480px pause point.
+      // Use 5x viewport height but enforce a 3000px minimum.
+      const computed = window.innerHeight * 5;
+      spacer.style.height = Math.max(computed, 3000) + 'px';
     }
 
     function resizeCanvas() {
