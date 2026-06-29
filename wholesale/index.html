@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PretzelSticksPapis - Checkout</title>
+  <link rel="stylesheet" href="/src/style.css" />
+  <style>
+    .checkout-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 4rem 2rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+    }
+
+    @media (max-width: 768px) {
+      .checkout-container {
+        grid-template-columns: 1fr;
+        padding: 2rem 1rem;
+      }
+    }
+
+    .column-title {
+      color: var(--color-accent-gold);
+      margin-bottom: 2rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .shipping-form, .payment-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .input-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .input-wrapper label {
+      font-size: 0.85rem;
+      color: var(--color-text-cream);
+      opacity: 0.9;
+    }
+
+    .input-wrapper input, .input-wrapper select {
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: var(--color-white);
+      padding: 1rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .input-wrapper input:focus, .input-wrapper select:focus {
+      border-color: var(--color-accent-gold);
+    }
+
+    .branded-image {
+      width: 100%;
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      border: 1px solid rgba(204, 164, 59, 0.3);
+    }
+
+    .legal-copy {
+      font-size: 0.8rem;
+      color: rgba(244, 241, 234, 0.6);
+      margin-top: 1rem;
+    }
+
+    .product-summary {
+      background-color: var(--color-modal-bg);
+      padding: 1.5rem;
+      border-radius: 8px;
+      border: 1px solid var(--color-accent-gold);
+      margin-bottom: 2rem;
+    }
+
+    .product-title {
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+      color: var(--color-white);
+    }
+
+    .price-display {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-terracotta);
+      margin-top: 1rem;
+    }
+
+    .btn-pay {
+      background: linear-gradient(135deg, var(--color-terracotta) 0%, #C05A3E 100%);
+      color: var(--color-white);
+      border: none;
+      padding: 1.25rem;
+      font-size: 1.1rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .btn-pay:hover {
+      background: linear-gradient(135deg, var(--color-accent-gold) 0%, #B89230 100%);
+    }
+
+    /* Success Overlay */
+    .success-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(18, 18, 18, 0.95);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+
+    .success-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .success-card {
+      background-color: var(--color-modal-bg);
+      padding: 3rem;
+      border-radius: 12px;
+      text-align: center;
+      border: 1px solid var(--color-accent-gold);
+      max-width: 500px;
+    }
+
+    .success-card h2 {
+      color: var(--color-accent-gold);
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="checkout-container">
+    <!-- LEFT COLUMN -->
+    <div class="left-col">
+      <img src="/assets/churro-package.png" alt="Churro Package" class="branded-image" onerror="this.src='https://via.placeholder.com/800x400/121212/CCA43B?text=PREMIUM+CHURRO+PACKAGING'" />
+      <h2 class="column-title">Shipping Details</h2>
+      <form id="shipping-form" class="shipping-form">
+        <div class="input-wrapper">
+          <label>Full Name</label>
+          <input type="text" id="ship-name" required />
+        </div>
+        <div class="input-wrapper">
+          <label>Street Address</label>
+          <input type="text" id="ship-street" required />
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="input-wrapper">
+            <label>City</label>
+            <input type="text" id="ship-city" required />
+          </div>
+          <div class="input-wrapper">
+            <label>State</label>
+            <select id="ship-state" required>
+              <option value="">Select State</option>
+              <option value="CA">California</option>
+              <option value="NY">New York</option>
+              <option value="TX">Texas</option>
+              <!-- Add more states if needed -->
+            </select>
+          </div>
+        </div>
+        <div class="input-wrapper">
+          <label>Zip Code</label>
+          <input type="text" id="ship-zip" pattern="[0-9]{5}" title="Five digit zip code" required />
+        </div>
+        <p class="legal-copy">Flat-rate shipping included. Ships via UPS Ground.</p>
+      </form>
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="right-col">
+      <h2 class="column-title">Payment</h2>
+      
+      <div class="product-summary">
+        <div class="product-title">The 200-Pack Master Box</div>
+        <div class="input-wrapper">
+          <label>Quantity</label>
+          <select id="qty-selector">
+            <option value="1">1 Box</option>
+            <option value="2">2 Boxes</option>
+            <option value="5">5 Boxes</option>
+          </select>
+        </div>
+        <div class="price-display" id="total-price">$199.00</div>
+      </div>
+
+      <form id="payment-form" class="payment-form">
+        <div class="input-wrapper">
+          <label>Card Number</label>
+          <input type="text" id="cc-number" placeholder="0000 0000 0000 0000" maxlength="19" required />
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="input-wrapper">
+            <label>Expiry (MM/YY)</label>
+            <input type="text" id="cc-expiry" placeholder="MM/YY" maxlength="5" required />
+          </div>
+          <div class="input-wrapper">
+            <label>CVC</label>
+            <input type="text" id="cc-cvc" placeholder="123" maxlength="4" required />
+          </div>
+        </div>
+        <button type="submit" class="btn-pay" id="btn-pay-now">PAY NOW</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="success-overlay" id="success-overlay">
+    <div class="success-card">
+      <h2>Order Confirmed!</h2>
+      <p>Tracking Code: <strong id="tracking-display" style="color: var(--color-terracotta);"></strong></p>
+      <p style="margin: 2rem 0;">A shipping label has been sent to our warehouse.</p>
+      <button class="btn-pay" onclick="window.location.href='/'">BACK TO HOME</button>
+    </div>
+  </div>
+
+  <script src="/src/mock-api.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const qtySelector = document.getElementById('qty-selector');
+      const priceDisplay = document.getElementById('total-price');
+      const basePrice = 199.00;
+
+      qtySelector.addEventListener('change', (e) => {
+        const q = parseInt(e.target.value);
+        priceDisplay.textContent = `$${(basePrice * q).toFixed(2)}`;
+      });
+
+      const paymentForm = document.getElementById('payment-form');
+      const shippingForm = document.getElementById('shipping-form');
+
+      // Formatting
+      document.getElementById('cc-number').addEventListener('input', (e) => {
+        e.target.value = e.target.value.replace(/\D/g, '').replace(/(.{4})/g, '$1 ').trim();
+      });
+      document.getElementById('cc-expiry').addEventListener('input', (e) => {
+        let v = e.target.value.replace(/\D/g, '');
+        if (v.length >= 3) {
+          e.target.value = v.substring(0,2) + '/' + v.substring(2,4);
+        } else {
+          e.target.value = v;
+        }
+      });
+      document.getElementById('cc-cvc').addEventListener('input', (e) => {
+        e.target.value = e.target.value.replace(/\D/g, '');
+      });
+      
+      paymentForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // Basic validation for shipping form
+        if (!shippingForm.checkValidity()) {
+          shippingForm.reportValidity();
+          return;
+        }
+
+        const btn = document.getElementById('btn-pay-now');
+        btn.textContent = 'PROCESSING...';
+        btn.disabled = true;
+
+        if (window.mockCheckout) {
+          try {
+            const res = await window.mockCheckout({}, {});
+            if (res.success) {
+              document.getElementById('tracking-display').textContent = res.trackingCode;
+              document.getElementById('success-overlay').classList.add('active');
+            }
+          } catch (err) {
+            console.error(err);
+          }
+        }
+        
+        btn.textContent = 'PAY NOW';
+        btn.disabled = false;
+      });
+    });
+  </script>
+</body>
+</html>
