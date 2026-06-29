@@ -1,13 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@600;700&display=swap');
+
 :root {
-  --color-base: #121212;
-  --color-modal-bg: #1E1E1E;
+  --color-base:        #0e0e0e;
+  --color-modal-bg:    #1a1a1a;
+  --color-surface:     #222222;
   --color-accent-gold: #CCA43B;
-  --color-terracotta: #D76F30;
-  --color-text-cream: #F4F1EA;
-  --color-white: #FFFFFF;
-  --header-height: 76px;
-  --footer-height: 64px;
+  --color-terracotta:  #D76F30;
+  --color-text-cream:  #F4F1EA;
+  --color-white:       #FFFFFF;
+  --color-border:      rgba(255, 255, 255, 0.08);
+  --header-height:     76px;
+  --footer-height:     64px;
 }
+
+/* ============================================================
+   BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; }
 
 body {
   margin: 0;
@@ -18,11 +27,9 @@ body {
   overflow-x: hidden;
 }
 
-/* 
-  ===========================================
-  MODAL OVERLAY (State 1)
-  ===========================================
-*/
+/* ============================================================
+   LEAD CAPTURE MODAL (State 1)
+   ============================================================ */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -45,7 +52,6 @@ body {
   max-width: 420px;
   padding: 2.5rem;
   box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  box-sizing: border-box;
 }
 
 .brand-title {
@@ -76,7 +82,6 @@ body {
   padding: 0.75rem 0;
   margin-bottom: 1.5rem;
   outline: none;
-  box-sizing: border-box;
   transition: border-color 0.3s ease;
 }
 
@@ -123,7 +128,7 @@ body {
   letter-spacing: 1px;
   border-radius: 4px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .btn-primary:hover {
@@ -141,20 +146,17 @@ body {
   font-weight: 600;
   border-radius: 4px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .btn-secondary:hover {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* 
-  ===========================================
-  SCROLL VIDEO CONTAINER (State 2)
-  ===========================================
-*/
+/* ============================================================
+   SCROLL VIDEO CONTAINER (State 2)
+   ============================================================ */
 .scroling-video-container {
-  /* Using specific name from sample */
   position: relative;
   width: 100vw;
   background-color: var(--color-base);
@@ -163,10 +165,8 @@ body {
 .scrolling-video video,
 .scrolling-video .e-hosted-video {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 2px;
-  height: 2px;
+  top: 0; left: 0;
+  width: 2px; height: 2px;
   opacity: 0.01;
   overflow: hidden;
   pointer-events: none;
@@ -175,8 +175,7 @@ body {
 
 .vs-spacer {
   position: absolute;
-  top: 0;
-  left: 0;
+  top: 0; left: 0;
   width: 100%;
   pointer-events: none;
 }
@@ -186,7 +185,9 @@ body {
   top: var(--header-height);
   height: calc(100vh - var(--header-height) - var(--footer-height));
   overflow: hidden;
+  /* Promote to compositor layer — prevents layout recalc during canvas redraws */
   transition: opacity 0.5s ease;
+  will-change: transform;
 }
 
 .vs-cv {
@@ -214,10 +215,12 @@ body {
 
 @keyframes vs-pulse {
   0%, 100% { background: rgba(0, 0, 0, 0.1); }
-  50%      { background: rgba(0, 0, 0, 0.4); }
+  50%       { background: rgba(0, 0, 0, 0.4); }
 }
 
-/* Robot Check Loading Overlay */
+/* ============================================================
+   ROBOT CHECK OVERLAY
+   ============================================================ */
 .robot-check-overlay {
   position: fixed;
   inset: 0;
@@ -245,11 +248,11 @@ body {
   animation: spin 1s linear infinite;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+@keyframes spin { to { transform: rotate(360deg); } }
 
-/* Welcome Banner Overlay */
+/* ============================================================
+   WELCOME BANNER
+   ============================================================ */
 .welcome-banner-overlay {
   position: fixed;
   inset: 0;
@@ -263,7 +266,7 @@ body {
 }
 
 .welcome-text {
-  font-family: "Impact", "Oswald", sans-serif;
+  font-family: "Oswald", "Impact", sans-serif;
   font-size: 6rem;
   font-weight: bold;
   text-transform: uppercase;
@@ -275,27 +278,24 @@ body {
   animation: slight-zoom 1.5s ease-out forwards;
 }
 
-@keyframes slight-zoom {
-  to { transform: scale(1); }
-}
+@keyframes slight-zoom { to { transform: scale(1); } }
 
-/* 
-  ===========================================
-  HEADERS & FOOTERS
-  ===========================================
-*/
-.top-header, .bottom-footer {
+/* ============================================================
+   HEADERS & FOOTERS
+   ============================================================ */
+.top-header,
+.bottom-footer {
   position: fixed;
-  left: 0;
-  right: 0;
-  background-color: var(--color-base); /* Solid background to hide content scrolling behind */
+  left: 0; right: 0;
+  background-color: var(--color-base);
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 2.5rem;
   z-index: 1000;
   font-family: "Oswald", "Impact", "Inter", sans-serif;
-  box-sizing: border-box;
+  /* Smooth darkening transition */
+  transition: background-color 0.6s ease, box-shadow 0.6s ease;
 }
 
 .top-header {
@@ -310,6 +310,17 @@ body {
   border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+/* Darkened state — applied when at scroll top after animation starts */
+.top-header.darkened {
+  background-color: #000000;
+  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.8);
+}
+
+.bottom-footer.darkened {
+  background-color: #000000;
+  box-shadow: 0 -4px 32px rgba(0, 0, 0, 0.8);
+}
+
 .brand {
   font-size: 1.8rem;
   font-weight: 700;
@@ -321,25 +332,32 @@ body {
 .header-nav {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
   font-size: 1rem;
 }
 
-.header-nav a {
+/* Nav buttons (Log In / Sign Up) */
+.nav-btn {
+  background: transparent;
+  border: none;
   color: var(--color-text-cream);
-  text-decoration: none;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
   opacity: 0.8;
-  transition: opacity 0.3s, color 0.3s;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  transition: opacity 0.25s, color 0.25s, background-color 0.25s;
+  letter-spacing: 0.5px;
 }
 
-.header-nav a:hover {
+.nav-btn:hover {
   opacity: 1;
   color: var(--color-accent-gold);
 }
 
-.divider {
-  color: rgba(255, 255, 255, 0.2);
-}
+.divider { color: rgba(255, 255, 255, 0.2); }
 
 .footer-links {
   display: flex;
@@ -353,80 +371,264 @@ body {
   transition: color 0.3s;
 }
 
-.footer-links a:hover {
-  color: var(--color-text-cream);
-}
+.footer-links a:hover { color: var(--color-text-cream); }
 
 .footer-copy {
   font-size: 0.9rem;
   color: rgba(255, 255, 255, 0.4);
 }
 
+/* ============================================================
+   AUTH MODALS (Log In / Sign Up)
+   ============================================================ */
+.auth-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  /* Glassmorphism backdrop */
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  background: rgba(0, 0, 0, 0);
+  /* Hidden by default */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease, backdrop-filter 0.35s ease, background 0.35s ease;
+}
+
+.auth-modal-overlay.auth-open {
+  opacity: 1;
+  pointer-events: auto;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(0, 0, 0, 0.65);
+}
+
+.auth-modal-card {
+  position: relative;
+  background: linear-gradient(145deg, #1c1c1c 0%, #161616 100%);
+  border: 1px solid rgba(204, 164, 59, 0.25);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 400px;
+  padding: 2.5rem 2rem 2rem;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.04),
+    0 20px 60px rgba(0, 0, 0, 0.7),
+    0 0 40px rgba(204, 164, 59, 0.06);
+  transform: translateY(20px) scale(0.97);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.auth-modal-overlay.auth-open .auth-modal-card {
+  transform: translateY(0) scale(1);
+}
+
+/* Close button */
+.auth-close-btn {
+  position: absolute;
+  top: 1rem; right: 1rem;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--color-text-cream);
+  font-size: 1.2rem;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1;
+  transition: background 0.2s, color 0.2s;
+}
+
+.auth-close-btn:hover {
+  background: rgba(204, 164, 59, 0.2);
+  color: var(--color-accent-gold);
+}
+
+/* Brand mark */
+.auth-brand-mark {
+  font-family: "Oswald", sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--color-accent-gold);
+  text-align: center;
+  margin-bottom: 1rem;
+  opacity: 0.8;
+}
+
+.auth-title {
+  font-family: "Oswald", sans-serif;
+  font-size: 1.9rem;
+  font-weight: 700;
+  text-align: center;
+  margin: 0 0 0.25rem;
+  color: var(--color-white);
+  letter-spacing: 1px;
+}
+
+.auth-subtitle {
+  text-align: center;
+  font-size: 0.85rem;
+  color: rgba(244, 241, 234, 0.55);
+  margin: 0 0 1.75rem;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.auth-field label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(244, 241, 234, 0.6);
+}
+
+.auth-field input {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: var(--color-white);
+  font-family: "Inter", sans-serif;
+  font-size: 0.95rem;
+  padding: 0.65rem 0.85rem;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.auth-field input:focus {
+  border-color: var(--color-accent-gold);
+  box-shadow: 0 0 0 3px rgba(204, 164, 59, 0.15);
+}
+
+.auth-field input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+/* Password field wrapper */
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper input {
+  padding-right: 2.8rem;
+}
+
+.toggle-pw {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0;
+  line-height: 1;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.toggle-pw:hover { opacity: 1; }
+
+/* Forgot password link */
+.forgot-link {
+  font-size: 0.8rem;
+  color: var(--color-accent-gold);
+  text-decoration: none;
+  align-self: flex-end;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+  margin-top: -0.25rem;
+}
+
+.forgot-link:hover { opacity: 1; }
+
+/* Submit button */
+.auth-submit-btn {
+  margin-top: 0.5rem;
+  background: linear-gradient(135deg, var(--color-accent-gold) 0%, #b08a28 100%);
+  color: #0e0e0e;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8rem;
+  font-family: "Oswald", sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity 0.25s, transform 0.2s, box-shadow 0.25s;
+  box-shadow: 0 4px 16px rgba(204, 164, 59, 0.3);
+}
+
+.auth-submit-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(204, 164, 59, 0.4);
+}
+
+.auth-submit-btn:active {
+  transform: translateY(0);
+}
+
+/* Switch text */
+.auth-switch-text {
+  margin: 1.25rem 0 0;
+  text-align: center;
+  font-size: 0.83rem;
+  color: rgba(244, 241, 234, 0.5);
+}
+
+.auth-switch-btn {
+  background: none;
+  border: none;
+  color: var(--color-accent-gold);
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: opacity 0.2s;
+}
+
+.auth-switch-btn:hover { opacity: 0.75; }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
 @media (max-width: 768px) {
   :root {
     --header-height: 90px;
     --footer-height: 80px;
   }
+
   .welcome-text { font-size: 3.5rem; }
-  .top-header, .bottom-footer { 
-    padding: 1rem; 
-    flex-direction: column; 
+
+  .top-header,
+  .bottom-footer {
+    padding: 1rem;
+    flex-direction: column;
     justify-content: center;
-    gap: 0.5rem; 
+    gap: 0.5rem;
   }
-}
 
-/*
-  ===========================================
-  BOTTOM CTA
-  ===========================================
-*/
-.bottom-cta {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.5s ease;
-}
-
-.bottom-cta.active {
-  pointer-events: auto;
-  opacity: 1;
-}
-
-/* Dim background when CTA active */
-.scroling-video-container.dimmed .vs-cv-wrap {
-  opacity: 0.4;
-}
-
-.btn-cta {
-  background: linear-gradient(135deg, var(--color-accent-gold) 0%, #B89230 100%);
-  color: var(--color-white);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 1.25rem 2.5rem;
-  font-size: 1.1rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  border-radius: 6px;
-  cursor: pointer;
-  box-shadow: 0 4px 15px rgba(204, 164, 59, 0.3), inset 0 1px 0 rgba(255,255,255,0.4);
-  transform: scale(0.8);
-  opacity: 0;
-  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.bottom-cta.active .btn-cta {
-  transform: scale(1);
-  opacity: 1;
-}
-
-.btn-cta:hover {
-  background: linear-gradient(135deg, var(--color-terracotta) 0%, #C05A3E 100%);
-  box-shadow: 0 6px 20px rgba(215, 111, 48, 0.4);
-  border-color: rgba(255,255,255,0.3);
+  .auth-modal-card {
+    padding: 2rem 1.5rem 1.5rem;
+  }
 }

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sweet Sinammony — PretzelSticksPapis</title>
+  <meta name="description" content="Experience the iconic Sweet Sinammony flavor from PretzelSticksPapis. Join the network and become a partner." />
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <!-- Top Header -->
+  <header class="top-header" id="top-header">
+    <div class="brand">PRETZEL-STICKS-PAPIS</div>
+    <div class="header-nav">
+      <button id="btn-login" class="nav-btn">Log In</button>
+      <span class="divider">|</span>
+      <button id="btn-signup" class="nav-btn">Sign Up</button>
+    </div>
+  </header>
+
+  <!-- Robot Check Overlay -->
+  <div id="robot-check" class="robot-check-overlay">
+    <div class="spinner"></div>
+    <p>Verifying you are not a robot... <span id="countdown">3</span>s</p>
+  </div>
+
+  <!-- Welcome Banner -->
+  <div id="welcome-banner" class="welcome-banner-overlay" style="display: none; opacity: 0;">
+    <h1 class="welcome-text">WELCOME TO...</h1>
+  </div>
+
+  <!-- Lead Capture Modal -->
+  <div id="lead-modal" class="modal-overlay" style="opacity: 0; pointer-events: none;">
+    <div class="modal-card">
+      <h2 class="brand-title">Partner With Us</h2>
+      <p class="modal-subtitle">Join the PretzelSticksPapis network.</p>
+      
+      <form id="lead-form">
+        <div class="input-group">
+          <input type="tel" id="phone-number" placeholder="(555) 555-5555" required />
+        </div>
+        
+        <div class="compliance-group">
+          <label><input type="checkbox" id="consent-sms" required /> I agree to receive text messages</label>
+          <label><input type="checkbox" id="consent-cookies" required /> I accept the use of cookies</label>
+          <label><input type="checkbox" id="consent-tos" required /> I agree to the Terms of Service</label>
+          <label><input type="checkbox" id="consent-privacy" required /> I agree to the Privacy Policy</label>
+        </div>
+        
+        <div class="button-row">
+          <button type="submit" class="btn-primary">AGREE</button>
+          <button type="button" id="btn-later" class="btn-secondary">Maybe Later</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== LOGIN MODAL ===== -->
+  <div id="login-modal" class="auth-modal-overlay" aria-modal="true" role="dialog" aria-labelledby="login-title">
+    <div class="auth-modal-card" id="login-card">
+      <button class="auth-close-btn" id="login-close-btn" aria-label="Close login modal">&times;</button>
+      <div class="auth-brand-mark">PSP</div>
+      <h2 class="auth-title" id="login-title">Welcome Back</h2>
+      <p class="auth-subtitle">Sign in to your account</p>
+
+      <form id="login-form" class="auth-form" novalidate>
+        <div class="auth-field">
+          <label for="login-email">Email</label>
+          <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email" />
+        </div>
+        <div class="auth-field">
+          <label for="login-password">Password</label>
+          <div class="password-wrapper">
+            <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" />
+            <button type="button" class="toggle-pw" data-target="login-password" aria-label="Toggle password visibility">👁</button>
+          </div>
+        </div>
+        <a href="#" class="auth-link forgot-link">Forgot your password?</a>
+        <button type="submit" class="auth-submit-btn">Log In</button>
+      </form>
+
+      <p class="auth-switch-text">Don't have an account? <button class="auth-switch-btn" id="switch-to-signup">Sign Up</button></p>
+    </div>
+  </div>
+
+  <!-- ===== SIGN UP MODAL ===== -->
+  <div id="signup-modal" class="auth-modal-overlay" aria-modal="true" role="dialog" aria-labelledby="signup-title">
+    <div class="auth-modal-card" id="signup-card">
+      <button class="auth-close-btn" id="signup-close-btn" aria-label="Close sign up modal">&times;</button>
+      <div class="auth-brand-mark">PSP</div>
+      <h2 class="auth-title" id="signup-title">Create Account</h2>
+      <p class="auth-subtitle">Join the PretzelSticksPapis network</p>
+
+      <form id="signup-form" class="auth-form" novalidate>
+        <div class="auth-field">
+          <label for="signup-name">Full Name</label>
+          <input type="text" id="signup-name" placeholder="Your Name" autocomplete="name" />
+        </div>
+        <div class="auth-field">
+          <label for="signup-email">Email</label>
+          <input type="email" id="signup-email" placeholder="you@example.com" autocomplete="email" />
+        </div>
+        <div class="auth-field">
+          <label for="signup-password">Password</label>
+          <div class="password-wrapper">
+            <input type="password" id="signup-password" placeholder="••••••••" autocomplete="new-password" />
+            <button type="button" class="toggle-pw" data-target="signup-password" aria-label="Toggle password visibility">👁</button>
+          </div>
+        </div>
+        <div class="auth-field">
+          <label for="signup-confirm">Confirm Password</label>
+          <div class="password-wrapper">
+            <input type="password" id="signup-confirm" placeholder="••••••••" autocomplete="new-password" />
+            <button type="button" class="toggle-pw" data-target="signup-confirm" aria-label="Toggle password visibility">👁</button>
+          </div>
+        </div>
+        <button type="submit" class="auth-submit-btn">Create Account</button>
+      </form>
+
+      <p class="auth-switch-text">Already have an account? <button class="auth-switch-btn" id="switch-to-login">Log In</button></p>
+    </div>
+  </div>
+
+  <!-- Scroll-Bound Video Animation -->
+  <div class="scroling-video-container" id="video-container">
+    <div class="scrolling-video">
+      <video id="bg-video" preload="auto" muted playsinline>
+        <source src="/myvideo/output.webm" type="video/webm">
+        <source src="/myvideo/output.mp4" type="video/mp4">
+      </video>
+    </div>
+  </div>
+
+  <!-- Bottom Footer -->
+  <footer class="bottom-footer" id="bottom-footer">
+    <div class="footer-links">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+      <a href="#">Contact Us</a>
+    </div>
+    <div class="footer-copy">
+      &copy; 2026 Pretzel-Sticks-Papis.
+    </div>
+  </footer>
+
+  <script src="/src/mock-api.js"></script>
+  <script src="/src/main.js" type="module"></script>
+</body>
+</html>

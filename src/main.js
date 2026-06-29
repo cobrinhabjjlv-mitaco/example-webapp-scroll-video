@@ -1,21 +1,55 @@
 // Import styles
 import './style.css';
 
-document.addEventListener('DOMContentLoaded', () => {
-  const modal = document.getElementById('lead-modal');
-  const leadForm = document.getElementById('lead-form');
-  const btnLater = document.getElementById('btn-later');
-  const btnWholesale = document.getElementById('btn-wholesale');
-  const videoContainer = document.getElementById('video-container');
-  const robotCheck = document.getElementById('robot-check');
+// ── Scroll restoration ─────────────────────────────────────────────────────
+// Prevent browser from jumping to the previous scroll position on reload.
+if (history.scrollRestoration) {
+  history.scrollRestoration = 'manual';
+}
+window.scrollTo(0, 0);
 
-  // Lock scroll initially
+// ── Auth modal helpers ─────────────────────────────────────────────────────
+function openAuthModal(modalEl) {
+  modalEl.classList.add('auth-open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeAuthModal(modalEl) {
+  modalEl.classList.remove('auth-open');
+  // Restore body scroll only if lead-modal is also gone
+  const leadModal = document.getElementById('lead-modal');
+  if (!leadModal || leadModal.style.display === 'none' || parseFloat(leadModal.style.opacity) === 0) {
+    document.body.style.overflow = '';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // ── Element refs ──────────────────────────────────────────────────────────
+  const modal          = document.getElementById('lead-modal');
+  const leadForm       = document.getElementById('lead-form');
+  const btnLater       = document.getElementById('btn-later');
+  const videoContainer = document.getElementById('video-container');
+  const robotCheck     = document.getElementById('robot-check');
+  const topHeader      = document.getElementById('top-header');
+  const bottomFooter   = document.getElementById('bottom-footer');
+
+  // Auth modal refs
+  const loginModal      = document.getElementById('login-modal');
+  const signupModal     = document.getElementById('signup-modal');
+  const btnLogin        = document.getElementById('btn-login');
+  const btnSignup       = document.getElementById('btn-signup');
+  const loginCloseBtn   = document.getElementById('login-close-btn');
+  const signupCloseBtn  = document.getElementById('signup-close-btn');
+  const switchToSignup  = document.getElementById('switch-to-signup');
+  const switchToLogin   = document.getElementById('switch-to-login');
+
+  // ── Lock scroll initially (lead modal flow) ───────────────────────────────
   document.body.style.overflow = 'hidden';
 
-  // Start buffering and loading frames immediately behind the loading screens
+  // ── Start buffering video frames immediately ──────────────────────────────
   initScrollVideo(videoContainer);
 
-  // 3-second loading sequence with countdown
+  // ── 3-second robot-check countdown ───────────────────────────────────────
   let count = 3;
   const countEl = document.getElementById('countdown');
   const timerInterval = setInterval(() => {
@@ -28,10 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }, 1000);
 
   setTimeout(() => {
-    // Fade out robot check
     robotCheck.style.opacity = '0';
-    
-    // Slowly fade in the modal
     setTimeout(() => {
       robotCheck.style.display = 'none';
       modal.style.transition = 'opacity 1s ease';
@@ -40,107 +71,124 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 1000);
   }, 3000);
 
-  let isSecondHalfTriggered = false;
+  // ── Scroll animation state ────────────────────────────────────────────────
   let cancelCurrentScroll = null;
+  let animationTriggered  = false;     // true after modal is dismissed
+  let upwardOnlyActive    = false;     // true after reaching 1480px stop
 
+  // ── autoScrollSegment ────────────────────────────────────────────────────
   function autoScrollSegment(startPixel, endPixel, durationMs, onComplete) {
     const startTime = performance.now();
     let canceled = false;
-    
-    // Allow cancelling a running animation
+
     cancelCurrentScroll = () => { canceled = true; };
 
     function step(currentTime) {
       if (canceled) return;
-      
-      const elapsed = currentTime - startTime;
+      const elapsed  = currentTime - startTime;
       const progress = Math.min(elapsed / durationMs, 1);
-      const currentY = startPixel + (endPixel - startPixel) * progress;
-      
+      const eased    = easeInOutCubic(progress);
+      const currentY = startPixel + (endPixel - startPixel) * eased;
       window.scrollTo(0, currentY);
-
       if (progress < 1) {
         requestAnimationFrame(step);
       } else if (onComplete) {
         onComplete();
       }
     }
-    
     requestAnimationFrame(step);
   }
 
-  function triggerFinalScroll() {
-    if (isSecondHalfTriggered) return;
-    isSecondHalfTriggered = true;
-
-    // Stop Phase 1 if it's still running
-    if (cancelCurrentScroll) cancelCurrentScroll();
-
-    // Hide CTA temporarily if it was visible
-    document.getElementById('bottom-cta').classList.remove('active');
-
-    const currentPos = window.scrollY;
-    const finalTarget = document.body.scrollHeight - window.innerHeight;
-
-    autoScrollSegment(currentPos, finalTarget, 10000, () => {
-      document.body.style.overflow = ''; // Finally unlock scroll
-      document.getElementById('bottom-cta').classList.add('active'); // Show final CTA
-    });
+  // Smooth easing so the scroll feels natural rather than linear
+  function easeInOutCubic(t) {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
   }
 
+  // ── Enable upward-only scroll past 1480px ─────────────────────────────────
+  const PHASE1_STOP = 1480;
+
+  function enableUpwardOnlyScroll() {
+    upwardOnlyActive = true;
+    document.body.style.overflow = ''; // release the lock — scrollbar appears
+
+    let clampScheduled = false;
+    window.addEventListener('scroll', () => {
+      if (!upwardOnlyActive) return;
+      if (window.scrollY > PHASE1_STOP && !clampScheduled) {
+        clampScheduled = true;
+        // Push back to stop point on next frame to avoid jank
+        requestAnimationFrame(() => {
+          window.scrollTo({ top: PHASE1_STOP, behavior: 'instant' });
+          clampScheduled = false;
+        });
+      }
+    }, { passive: true });
+  }
+
+  // ── Header / footer darkening when scrolled to the very top ──────────────
+  function updateHeaderFooterDim() {
+    if (!animationTriggered) return;
+    if (window.scrollY < 30) {
+      topHeader.classList.add('darkened');
+      bottomFooter.classList.add('darkened');
+    } else {
+      topHeader.classList.remove('darkened');
+      bottomFooter.classList.remove('darkened');
+    }
+  }
+
+  window.addEventListener('scroll', updateHeaderFooterDim, { passive: true });
+
+  // ── dismissModal (lead capture → animation sequence) ─────────────────────
   function dismissModal() {
-    // 1. Fade out modal over 1.5s
     modal.style.transition = 'opacity 1.5s ease';
     modal.style.opacity = '0';
     modal.style.pointerEvents = 'none';
-    
+
     setTimeout(() => {
       modal.style.display = 'none';
-      
-      // 2. Fade in "Welcome" banner over 1.5s
+      animationTriggered = true;
+
+      // Show "Welcome" banner
       const welcomeBanner = document.getElementById('welcome-banner');
       welcomeBanner.style.display = 'flex';
       welcomeBanner.style.transition = 'opacity 1.5s ease';
-      
-      // Force browser reflow to ensure transition works
-      void welcomeBanner.offsetWidth; 
+      void welcomeBanner.offsetWidth;
       welcomeBanner.style.opacity = '1';
-      
-      // Keep banner visible for 1 second, then fade out and scroll
+
       setTimeout(() => {
-        // 3. Fade out banner over 0.7s
+        // Fade out banner
         welcomeBanner.style.transition = 'opacity 0.7s ease';
         welcomeBanner.style.opacity = '0';
-        
-        // 4. Start Phase 1 of the scroll animation
-        autoScrollSegment(window.scrollY, 1480, 50000, () => {
-          console.log("Paused at 1480px. Scroll remains locked.");
-          // Show the button so the user can interact and trigger Phase 2
-          document.getElementById('bottom-cta').classList.add('active');
+
+        // Phase 1 — auto-scroll to 1480px stop point
+        autoScrollSegment(window.scrollY, PHASE1_STOP, 5000, () => {
+          console.log('Reached 1480px stop. Enabling upward-only scroll.');
+          enableUpwardOnlyScroll();
+          // Darken header/footer since we're at the stop (not at top)
+          updateHeaderFooterDim();
         });
-        
+
         setTimeout(() => {
           welcomeBanner.style.display = 'none';
         }, 700);
-      }, 1500 + 1000); // 1.5s fade in + 1s read time
-      
+
+      }, 1500 + 1000); // 1.5s fade-in + 1s read time
+
     }, 1500);
   }
 
-  // Handle lead form submission
+  // ── Lead form submission ──────────────────────────────────────────────────
   leadForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const phone = document.getElementById('phone-number').value;
-    
-    // Call mock API
     if (window.mockSubmitLead) {
       await window.mockSubmitLead(phone);
     }
-    
     dismissModal();
   });
 
-  // Phone masking
+  // ── Phone input masking ───────────────────────────────────────────────────
   const phoneInput = document.getElementById('phone-number');
   if (phoneInput) {
     phoneInput.addEventListener('input', (e) => {
@@ -149,35 +197,80 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-
-  // Handle "Maybe Later"
+  // ── "Maybe Later" ────────────────────────────────────────────────────────
   btnLater.addEventListener('click', () => {
-    // We dismiss the modal, which eventually triggers Phase 1
     dismissModal();
-    // (We do not triggerFinalScroll here, otherwise it skips Phase 1 entirely)
   });
 
-  btnWholesale.addEventListener('click', (e) => {
-    if (!isSecondHalfTriggered) {
-      e.preventDefault();
-      // If clicked while paused at 1480px, it resumes Phase 2!
-      triggerFinalScroll();
-    } else {
-      // If Phase 2 is done, clicking it navigates to the wholesale page
-      window.location.href = '/wholesale';
+  // ── LOGIN MODAL ───────────────────────────────────────────────────────────
+  btnLogin.addEventListener('click', () => {
+    closeAuthModal(signupModal);
+    openAuthModal(loginModal);
+  });
+
+  loginCloseBtn.addEventListener('click', () => closeAuthModal(loginModal));
+
+  loginModal.addEventListener('click', (e) => {
+    if (e.target === loginModal) closeAuthModal(loginModal);
+  });
+
+  document.getElementById('login-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    // TODO: wire up real auth
+    closeAuthModal(loginModal);
+  });
+
+  // ── SIGN UP MODAL ─────────────────────────────────────────────────────────
+  btnSignup.addEventListener('click', () => {
+    closeAuthModal(loginModal);
+    openAuthModal(signupModal);
+  });
+
+  signupCloseBtn.addEventListener('click', () => closeAuthModal(signupModal));
+
+  signupModal.addEventListener('click', (e) => {
+    if (e.target === signupModal) closeAuthModal(signupModal);
+  });
+
+  document.getElementById('signup-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    // TODO: wire up real auth
+    closeAuthModal(signupModal);
+  });
+
+  // ── Switch between auth modals ────────────────────────────────────────────
+  switchToSignup.addEventListener('click', () => {
+    closeAuthModal(loginModal);
+    openAuthModal(signupModal);
+  });
+
+  switchToLogin.addEventListener('click', () => {
+    closeAuthModal(signupModal);
+    openAuthModal(loginModal);
+  });
+
+  // ── Password visibility toggles ───────────────────────────────────────────
+  document.querySelectorAll('.toggle-pw').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const input = document.getElementById(btn.dataset.target);
+      if (!input) return;
+      input.type = input.type === 'password' ? 'text' : 'password';
+      btn.textContent = input.type === 'password' ? '👁' : '🙈';
+    });
+  });
+
+  // ── Escape key closes auth modals ─────────────────────────────────────────
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeAuthModal(loginModal);
+      closeAuthModal(signupModal);
     }
   });
 
-  // ============================================
-  // Scroll-bound video animation logic (from sample)
-  // ============================================
+  // ============================================================
+  // Scroll-bound video animation logic
+  // ============================================================
   const TARGET_W = 1280;
-
-  function getFit() {
-    // Always use cover so the square video fills the full screen on
-    // both desktop and mobile — no black bars on any device.
-    return 'cover';
-  }
 
   function initScrollVideo(container) {
     const videoWidget = container.querySelector('.scrolling-video');
@@ -189,11 +282,9 @@ document.addEventListener('DOMContentLoaded', () => {
     vid.removeAttribute('controls');
     vid.preload = 'auto';
 
-    try {
-      vid.crossOrigin = 'anonymous';
-    } catch (e) {}
+    try { vid.crossOrigin = 'anonymous'; } catch (e) {}
 
-    const spacer = document.createElement('div');
+    const spacer  = document.createElement('div');
     spacer.className = 'vs-spacer';
 
     const wrap = document.createElement('div');
@@ -213,22 +304,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const ctx = cv.getContext('2d', { alpha: true });
 
     const frames = [];
-    let N = 0;
-    let iw = 0;
-    let ih = 0;
-    let drawn = -1;
-    let total = 0;
+    let N = 0, iw = 0, ih = 0, drawn = -1;
 
     function syncSpacerHeight() {
-      // Must be tall enough for Phase 1 to reach the 1480px pause point.
-      // Use 5x viewport height but enforce a 3000px minimum.
       const computed = window.innerHeight * 5;
       spacer.style.height = Math.max(computed, 3000) + 'px';
     }
 
     function resizeCanvas() {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      cv.width = Math.round(wrap.clientWidth * dpr);
+      cv.width  = Math.round(wrap.clientWidth  * dpr);
       cv.height = Math.round(wrap.clientHeight * dpr);
       drawn = -1;
     }
@@ -236,33 +321,21 @@ document.addEventListener('DOMContentLoaded', () => {
     function draw(i) {
       const b = frames[i];
       if (!b) return;
+      const cw = cv.width, ch = cv.height;
 
-      const cw = cv.width;
-      const ch = cv.height;
-
-      // ── Stretch approach ──────────────────────────────────────────────
-      // On portrait mobile a 1:1 video fills the screen but crops too much.
-      // Instead of pure cover (crops sides) or contain (black bars on top),
-      // we interpolate 35% toward the viewport's own aspect ratio.
-      // This stretches the frame vertically so less of the sides are clipped,
-      // producing a natural-looking result on any screen size.
       const STRETCH_AMOUNT = 0.35;
-      const viewportRatio = ch / cw;        // e.g. 2.16 on iPhone portrait
-      const sourceRatio   = ih / iw;        // 1.0 for square video
-      const isMobile      = viewportRatio > 1.2; // portrait phone / tablet
+      const viewportRatio  = ch / cw;
+      const sourceRatio    = ih / iw;
+      const isMobile       = viewportRatio > 1.2;
 
       let dw, dh;
-
       if (isMobile && viewportRatio > sourceRatio) {
-        // Interpolate ratio 35% toward the viewport ratio
         const targetRatio = sourceRatio + STRETCH_AMOUNT * (viewportRatio - sourceRatio);
-        // Treat the frame as if it were this taller virtual size, then cover-scale
-        const virtualH = iw * targetRatio;
+        const virtualH    = iw * targetRatio;
         const s = Math.max(cw / iw, ch / virtualH);
         dw = iw * s;
-        dh = virtualH * s; // vertically stretched — fills height, less side-crop
+        dh = virtualH * s;
       } else {
-        // Desktop / landscape: standard cover, no stretch needed
         const s = Math.max(cw / iw, ch / ih);
         dw = iw * s;
         dh = ih * s;
@@ -270,7 +343,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const dx = (cw - dw) / 2;
       const dy = (ch - dh) / 2;
-
       ctx.clearRect(0, 0, cw, ch);
       ctx.drawImage(b, dx, dy, dw, dh);
       drawn = i;
@@ -278,34 +350,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function render() {
       if (!N) return;
-      
-      // Calculate scroll progress based on the spacer's position
       const rect = spacer.getBoundingClientRect();
       const scrollableDistance = rect.height - window.innerHeight;
-      
       let p = 0;
       if (scrollableDistance > 0) {
-        // Calculate how far we've scrolled down the spacer
-        const scrolled = -rect.top;
-        p = Math.min(1, Math.max(0, scrolled / scrollableDistance));
+        p = Math.min(1, Math.max(0, -rect.top / scrollableDistance));
       }
-
       const i = Math.round(p * (N - 1));
       if (i !== drawn) draw(i);
-      
-      // Show CTA if at the bottom
-      const cta = document.getElementById('bottom-cta');
-      if (p >= 0.99) {
-        cta.classList.add('active');
-        container.classList.add('dimmed');
-      } else {
-        cta.classList.remove('active');
-        container.classList.remove('dimmed');
-      }
     }
 
     window.addEventListener('scroll', render, { passive: true });
-
     window.addEventListener('resize', () => {
       syncSpacerHeight();
       resizeCanvas();
@@ -315,9 +370,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function bitmapOpts() {
       if (!TARGET_W || !vid.videoWidth) return undefined;
       return {
-        resizeWidth: TARGET_W,
-        resizeHeight: Math.round(TARGET_W * vid.videoHeight / vid.videoWidth),
-        resizeQuality: 'high'
+        resizeWidth:   TARGET_W,
+        resizeHeight:  Math.round(TARGET_W * vid.videoHeight / vid.videoWidth),
+        resizeQuality: 'high',
       };
     }
 
@@ -339,20 +394,19 @@ document.addEventListener('DOMContentLoaded', () => {
       const pending = [];
       const cb = () => {
         pending.push(grab(slot++));
-        if (!vid.ended) { vid.requestVideoFrameCallback(cb); }
+        if (!vid.ended) vid.requestVideoFrameCallback(cb);
       };
       vid.requestVideoFrameCallback(cb);
       vid.addEventListener('ended', async () => {
         await Promise.all(pending);
         finish();
       }, { once: true });
-
       const p = vid.play();
       if (p) p.catch(extractBySeek);
     }
 
     async function extractBySeek() {
-      const dur = vid.duration || 1;
+      const dur  = vid.duration || 1;
       const step = 1 / 30;
       let slot = 0;
       for (let t = 0; t < dur; t += step) {
