@@ -202,14 +202,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const cw = cv.width;
       const ch = cv.height;
-      const fit = getFit();
 
-      const s = fit === 'cover'
-        ? Math.max(cw / iw, ch / ih)
-        : Math.min(cw / iw, ch / ih);
+      // ── Stretch approach ──────────────────────────────────────────────
+      // On portrait mobile a 1:1 video fills the screen but crops too much.
+      // Instead of pure cover (crops sides) or contain (black bars on top),
+      // we interpolate 35% toward the viewport's own aspect ratio.
+      // This stretches the frame vertically so less of the sides are clipped,
+      // producing a natural-looking result on any screen size.
+      const STRETCH_AMOUNT = 0.35;
+      const viewportRatio = ch / cw;        // e.g. 2.16 on iPhone portrait
+      const sourceRatio   = ih / iw;        // 1.0 for square video
+      const isMobile      = viewportRatio > 1.2; // portrait phone / tablet
 
-      const dw = iw * s;
-      const dh = ih * s;
+      let dw, dh;
+
+      if (isMobile && viewportRatio > sourceRatio) {
+        // Interpolate ratio 35% toward the viewport ratio
+        const targetRatio = sourceRatio + STRETCH_AMOUNT * (viewportRatio - sourceRatio);
+        // Treat the frame as if it were this taller virtual size, then cover-scale
+        const virtualH = iw * targetRatio;
+        const s = Math.max(cw / iw, ch / virtualH);
+        dw = iw * s;
+        dh = virtualH * s; // vertically stretched — fills height, less side-crop
+      } else {
+        // Desktop / landscape: standard cover, no stretch needed
+        const s = Math.max(cw / iw, ch / ih);
+        dw = iw * s;
+        dh = ih * s;
+      }
+
       const dx = (cw - dw) / 2;
       const dy = (ch - dh) / 2;
 
