@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sweet Sinammony — PretzelSticksPapis</title>
   <meta name="description" content="Experience the iconic Sweet Sinammony flavor from PretzelSticksPapis. Join the network and become a partner." />
+  <meta name="publish-date" content="2026-06-29T20:53:25-05:00" />
   <link rel="stylesheet" href="/src/style.css" />
 </head>
 <body>
@@ -17,6 +18,15 @@
       <button id="btn-signup" class="nav-btn">Sign Up</button>
     </div>
   </header>
+
+  <!-- CTA Overlay (Fades in at 4.5s stop) -->
+  <div id="cta-overlay" class="cta-overlay" style="display: none;">
+    <div class="cta-card">
+      <div class="cta-countdown" id="countdown-timer">00d 00h 00m 00s</div>
+      <h2 class="cta-subtitle">Get it before it's gone!</h2>
+      <button id="btn-want-it" class="btn-want-it">I Want It</button>
+    </div>
+  </div>
 
   <!-- Robot Check Overlay -->
   <div id="robot-check" class="robot-check-overlay">
@@ -32,8 +42,7 @@
   <!-- Lead Capture Modal -->
   <div id="lead-modal" class="modal-overlay" style="opacity: 0; pointer-events: none;">
     <div class="modal-card">
-      <h2 class="brand-title">Partner With Us</h2>
-      <p class="modal-subtitle">Join the PretzelSticksPapis network.</p>
+      <h2 class="brand-title">Claim your EXCLUSIVE offer NOW!</h2>
       
       <form id="lead-form">
         <div class="input-group">
@@ -41,14 +50,11 @@
         </div>
         
         <div class="compliance-group">
-          <label><input type="checkbox" id="consent-sms" required /> I agree to receive text messages</label>
-          <label><input type="checkbox" id="consent-cookies" required /> I accept the use of cookies</label>
-          <label><input type="checkbox" id="consent-tos" required /> I agree to the Terms of Service</label>
-          <label><input type="checkbox" id="consent-privacy" required /> I agree to the Privacy Policy</label>
+          <label><input type="checkbox" id="consent-tos-privacy" required /> I agree to the Terms of Service and Privacy Policy</label>
         </div>
         
         <div class="button-row">
-          <button type="submit" class="btn-primary">AGREE</button>
+          <button type="submit" class="btn-primary">claim offer</button>
           <button type="button" id="btn-later" class="btn-secondary">Maybe Later</button>
         </div>
       </form>

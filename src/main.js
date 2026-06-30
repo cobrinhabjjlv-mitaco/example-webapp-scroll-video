@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const robotCheck     = document.getElementById('robot-check');
   const topHeader      = document.getElementById('top-header');
   const bottomFooter   = document.getElementById('bottom-footer');
+  const ctaOverlay     = document.getElementById('cta-overlay');
 
   // Auth modal refs
   const loginModal      = document.getElementById('login-modal');
@@ -43,8 +44,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const switchToSignup  = document.getElementById('switch-to-signup');
   const switchToLogin   = document.getElementById('switch-to-login');
 
+  // ── Scroll animation state ────────────────────────────────────────────────
+  let cancelCurrentScroll = null;
+  let animationTriggered  = false;     // true after modal is dismissed
+  let upwardOnlyActive    = false;     // true after reaching stop
+  let phase1Stop          = 1480;      // dynamic stop point in scroll px (default fallback)
+
   // ── Lock scroll initially (lead modal flow) ───────────────────────────────
   document.body.style.overflow = 'hidden';
+  window.scrollTo(0, 0);
+  setTimeout(() => window.scrollTo(0, 0), 50);
 
   // ── Start buffering video frames immediately ──────────────────────────────
   initScrollVideo(videoContainer);
@@ -70,11 +79,6 @@ document.addEventListener('DOMContentLoaded', () => {
       modal.style.pointerEvents = 'auto';
     }, 1000);
   }, 3000);
-
-  // ── Scroll animation state ────────────────────────────────────────────────
-  let cancelCurrentScroll = null;
-  let animationTriggered  = false;     // true after modal is dismissed
-  let upwardOnlyActive    = false;     // true after reaching 1480px stop
 
   // ── autoScrollSegment ────────────────────────────────────────────────────
   function autoScrollSegment(startPixel, endPixel, durationMs, onComplete) {
@@ -104,9 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
   }
 
-  // ── Enable upward-only scroll past 1480px ─────────────────────────────────
-  const PHASE1_STOP = 1480;
-
+  // ── Enable upward-only scroll past phase1Stop ─────────────────────────────
   function enableUpwardOnlyScroll() {
     upwardOnlyActive = true;
     document.body.style.overflow = ''; // release the lock — scrollbar appears
@@ -114,15 +116,38 @@ document.addEventListener('DOMContentLoaded', () => {
     let clampScheduled = false;
     window.addEventListener('scroll', () => {
       if (!upwardOnlyActive) return;
-      if (window.scrollY > PHASE1_STOP && !clampScheduled) {
+      if (window.scrollY > phase1Stop && !clampScheduled) {
         clampScheduled = true;
         // Push back to stop point on next frame to avoid jank
         requestAnimationFrame(() => {
-          window.scrollTo({ top: PHASE1_STOP, behavior: 'instant' });
+          window.scrollTo({ top: phase1Stop, behavior: 'instant' });
           clampScheduled = false;
         });
       }
     }, { passive: true });
+  }
+
+  // ── CTA Overlay Helpers ───────────────────────────────────────────────────
+  function showCtaOverlay() {
+    if (!ctaOverlay) return;
+    if (ctaOverlay.style.display === 'none') {
+      ctaOverlay.style.display = 'flex';
+      void ctaOverlay.offsetWidth; // force layout engine reflow
+    }
+    ctaOverlay.classList.add('cta-visible');
+  }
+
+  function hideCtaOverlay() {
+    if (!ctaOverlay) return;
+    if (ctaOverlay.classList.contains('cta-visible')) {
+      ctaOverlay.classList.remove('cta-visible');
+      // Hide completely after fade-out transition (0.8s)
+      setTimeout(() => {
+        if (!ctaOverlay.classList.contains('cta-visible')) {
+          ctaOverlay.style.display = 'none';
+        }
+      }, 800);
+    }
   }
 
   // ── Header / footer darkening when scrolled to the very top ──────────────
@@ -157,21 +182,23 @@ document.addEventListener('DOMContentLoaded', () => {
       welcomeBanner.style.opacity = '1';
 
       setTimeout(() => {
-        // Fade out banner
-        welcomeBanner.style.transition = 'opacity 0.7s ease';
+        // Fade out banner over 1.5s to overlap with the start of the scroll animation
+        welcomeBanner.style.transition = 'opacity 1.5s ease';
         welcomeBanner.style.opacity = '0';
 
-        // Phase 1 — auto-scroll to 1480px stop point
-        autoScrollSegment(window.scrollY, PHASE1_STOP, 5000, () => {
-          console.log('Reached 1480px stop. Enabling upward-only scroll.');
+        // Phase 1 — auto-scroll to stop point (overlapping with the banner fade out)
+        autoScrollSegment(window.scrollY, phase1Stop, 5000, () => {
+          console.log('Reached stop. Enabling upward-only scroll.');
           enableUpwardOnlyScroll();
           // Darken header/footer since we're at the stop (not at top)
           updateHeaderFooterDim();
+          // Guarantee the CTA overlay shows immediately when auto-scroll completes
+          showCtaOverlay();
         });
 
         setTimeout(() => {
           welcomeBanner.style.display = 'none';
-        }, 700);
+        }, 1500);
 
       }, 1500 + 1000); // 1.5s fade-in + 1s read time
 
@@ -305,10 +332,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const frames = [];
     let N = 0, iw = 0, ih = 0, drawn = -1;
+    let spacerHeight = 0;
+    let scrollableDistance = 0;
 
     function syncSpacerHeight() {
       const computed = window.innerHeight * 5;
-      spacer.style.height = Math.max(computed, 3000) + 'px';
+      spacerHeight = Math.max(computed, 3000);
+      spacer.style.height = spacerHeight + 'px';
+      scrollableDistance = spacerHeight - window.innerHeight;
+
+      // Calculate the scroll position corresponding to 4.5 seconds of the video
+      if (vid && vid.duration) {
+        const targetTime = Math.min(4.5, vid.duration);
+        phase1Stop = Math.round((targetTime / vid.duration) * scrollableDistance);
+      }
     }
 
     function resizeCanvas() {
@@ -323,26 +360,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!b) return;
       const cw = cv.width, ch = cv.height;
 
-      const STRETCH_AMOUNT = 0.35;
-      const viewportRatio  = ch / cw;
-      const sourceRatio    = ih / iw;
-      const isMobile       = viewportRatio > 1.2;
-
-      let dw, dh;
-      if (isMobile && viewportRatio > sourceRatio) {
-        const targetRatio = sourceRatio + STRETCH_AMOUNT * (viewportRatio - sourceRatio);
-        const virtualH    = iw * targetRatio;
-        const s = Math.max(cw / iw, ch / virtualH);
-        dw = iw * s;
-        dh = virtualH * s;
-      } else {
-        const s = Math.max(cw / iw, ch / ih);
-        dw = iw * s;
-        dh = ih * s;
-      }
-
+      // Contain scaling: keep 1:1 aspect ratio, no stretching, centered
+      const s = Math.min(cw / iw, ch / ih);
+      const dw = iw * s;
+      const dh = ih * s;
       const dx = (cw - dw) / 2;
       const dy = (ch - dh) / 2;
+
       ctx.clearRect(0, 0, cw, ch);
       ctx.drawImage(b, dx, dy, dw, dh);
       drawn = i;
@@ -350,14 +374,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function render() {
       if (!N) return;
-      const rect = spacer.getBoundingClientRect();
-      const scrollableDistance = rect.height - window.innerHeight;
       let p = 0;
+      const scrollTop = window.scrollY !== undefined ? window.scrollY : window.pageYOffset;
       if (scrollableDistance > 0) {
-        p = Math.min(1, Math.max(0, -rect.top / scrollableDistance));
+        p = Math.min(1, Math.max(0, scrollTop / scrollableDistance));
       }
       const i = Math.round(p * (N - 1));
       if (i !== drawn) draw(i);
+
+      // Trigger CTA overlay when scroll is close to phase1Stop (video 4.5s)
+      if (animationTriggered) {
+        if (scrollTop >= phase1Stop - 15) {
+          showCtaOverlay();
+        } else {
+          hideCtaOverlay();
+        }
+      }
     }
 
     window.addEventListener('scroll', render, { passive: true });
@@ -383,8 +415,23 @@ document.addEventListener('DOMContentLoaded', () => {
       if (slot === 0) { resizeCanvas(); draw(0); }
     }
 
+    function prewarmGPU() {
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = 1;
+      tempCanvas.height = 1;
+      const tempCtx = tempCanvas.getContext('2d');
+      if (tempCtx) {
+        for (let i = 0; i < frames.length; i++) {
+          if (frames[i]) {
+            tempCtx.drawImage(frames[i], 0, 0, 1, 1);
+          }
+        }
+      }
+    }
+
     function finish() {
       N = frames.length;
+      prewarmGPU();
       render();
       loading.classList.add('vs-loaded');
     }
@@ -432,6 +479,38 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       vid.addEventListener('loadedmetadata', start, { once: true });
     }
+  }
+
+  // ── Countdown Timer ───────────────────────────────────────────────────────
+  const publishMeta = document.querySelector('meta[name="publish-date"]');
+  const publishDateStr = publishMeta ? publishMeta.getAttribute('content') : null;
+  const startDate = publishDateStr ? new Date(publishDateStr) : new Date();
+
+  // Set end date to exactly one week (7 days) after the publish/metadata date
+  const targetDate = new Date(startDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+  const timerEl = document.getElementById('countdown-timer');
+  if (timerEl) {
+    const updateTimer = () => {
+      const now = new Date().getTime();
+      const distance = targetDate.getTime() - now;
+
+      if (distance < 0) {
+        timerEl.textContent = "00d 00h 00m 00s";
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      const pad = (num) => String(num).padStart(2, '0');
+      timerEl.textContent = `${pad(days)}d ${pad(hours)}h ${pad(minutes)}m ${pad(seconds)}s`;
+    };
+
+    updateTimer();
+    setInterval(updateTimer, 1000);
   }
 
 });

@@ -46,7 +46,7 @@ body {
 
 .modal-card {
   background-color: var(--color-modal-bg);
-  border: 1px solid var(--color-accent-gold);
+  border: 2px solid var(--color-terracotta);
   border-radius: 8px;
   width: 100%;
   max-width: 420px;
@@ -55,7 +55,7 @@ body {
 }
 
 .brand-title {
-  color: var(--color-accent-gold);
+  color: var(--color-terracotta);
   text-align: center;
   margin-top: 0;
   margin-bottom: 0.5rem;
@@ -86,7 +86,7 @@ body {
 }
 
 .input-group input[type="tel"]:focus {
-  border-bottom-color: var(--color-accent-gold);
+  border-bottom-color: var(--color-terracotta);
 }
 
 .input-group input[type="tel"]::placeholder {
@@ -184,6 +184,7 @@ body {
   position: sticky;
   top: var(--header-height);
   height: calc(100vh - var(--header-height) - var(--footer-height));
+  height: calc(100svh - var(--header-height) - var(--footer-height));
   overflow: hidden;
   /* Promote to compositor layer — prevents layout recalc during canvas redraws */
   transition: opacity 0.5s ease;
@@ -631,4 +632,106 @@ body {
   .auth-modal-card {
     padding: 2rem 1.5rem 1.5rem;
   }
+
+  /* Responsive countdown adjustments */
+  .cta-countdown {
+    font-size: 2.2rem !important;
+  }
+  .cta-subtitle {
+    font-size: 1rem !important;
+    margin-bottom: 1.8rem !important;
+  }
+  .cta-card {
+    padding: 2rem 1.5rem !important;
+    max-width: 90% !important;
+  }
+}
+
+/* ============================================================
+   CTA CARD OVERLAY
+   ============================================================ */
+.cta-overlay {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: var(--header-height);
+  bottom: var(--footer-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 900;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.35); /* shade slightly the back */
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+.cta-overlay.cta-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.cta-card {
+  text-align: center;
+  width: 100%;
+  max-width: 500px;
+  padding: 3.5rem 2.5rem;
+  background: transparent; /* transparent backing */
+  border: none; /* take out the orange border */
+  border-radius: 16px;
+  transform: translateY(30px);
+  transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.cta-overlay.cta-visible .cta-card {
+  transform: translateY(0);
+}
+
+.cta-countdown {
+  font-family: "Oswald", "Impact", sans-serif;
+  font-size: 4.5rem; /* Big across the screen! */
+  font-weight: 700;
+  color: var(--color-terracotta); /* Orange sinammony color */
+  text-shadow: 0 0 20px rgba(215, 111, 48, 0.4);
+  letter-spacing: 2px;
+  margin-bottom: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.cta-subtitle {
+  font-family: "Oswald", "Inter", sans-serif;
+  font-size: 1.4rem;
+  color: var(--color-text-cream);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin-top: 0;
+  margin-bottom: 2.2rem;
+  opacity: 0.95;
+}
+
+.btn-want-it {
+  background: linear-gradient(135deg, var(--color-terracotta) 0%, #b8501e 100%);
+  color: var(--color-white);
+  border: none;
+  border-radius: 8px;
+  padding: 1.1rem 3.5rem;
+  font-family: "Oswald", sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(215, 111, 48, 0.35);
+  transition: transform 0.2s, box-shadow 0.25s, background 0.3s;
+}
+
+.btn-want-it:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(215, 111, 48, 0.55);
+}
+
+.btn-want-it:active {
+  transform: translateY(0);
 }
