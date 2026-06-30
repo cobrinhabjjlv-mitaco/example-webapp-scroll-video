@@ -264,7 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('signup-form').addEventListener('submit', (e) => {
     e.preventDefault();
     // Redirect to onboarding workflow page
-    window.location.href = '/onboarding';
+    window.location.href = '/onboarding/';
   });
 
   // ── Switch between auth modals ────────────────────────────────────────────
