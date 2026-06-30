@@ -349,7 +349,7 @@
         }
       }
 
-      // Handle onboarding start submission (Mocking state change)
+      // Handle onboarding start submission (Redirect to dashboard)
       btnStart.addEventListener('click', () => {
         if (!btnStart.classList.contains('ready')) return;
 
@@ -358,21 +358,7 @@
         btnStart.disabled = true;
 
         setTimeout(() => {
-          // Fade out form view
-          formView.style.transition = 'opacity 0.4s ease';
-          formView.style.opacity = '0';
-
-          setTimeout(() => {
-            formView.style.display = 'none';
-
-            // Show success view
-            successView.style.display = 'flex';
-            void successView.offsetWidth; // Force browser layout reflow
-            successView.style.opacity = '1';
-
-            // Optional: Glow border success transition
-            cardContainer.style.borderColor = '#CCA43B'; // Gold glow on success
-          }, 400);
+          window.location.href = '/dashboard/';
         }, 1200); // 1.2s mock initialization delay
       });
     });

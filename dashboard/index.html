@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PretzelSticksPapis — Gen 1 Closer Dashboard</title>
+  <link rel="stylesheet" href="/src/style.css" />
+  <style>
+    body {
+      background-color: var(--color-base);
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      color: var(--color-text-cream);
+    }
+
+    /* Dashboard Layout */
+    .db-wrapper {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2.5rem;
+    }
+
+    /* Top Nav Bar */
+    .db-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .db-logo-section {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .db-logo {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: var(--color-terracotta);
+      text-transform: uppercase;
+      margin: 0;
+    }
+
+    .db-badge-rank {
+      background-color: rgba(204, 164, 59, 0.12);
+      border: 1px solid var(--color-accent-gold);
+      color: var(--color-accent-gold);
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 0.35rem 0.75rem;
+      border-radius: 4px;
+    }
+
+    .profile-card {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background-color: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+    }
+
+    .avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--color-terracotta) 0%, var(--color-accent-gold) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Oswald', sans-serif;
+      font-weight: 700;
+      color: var(--color-white);
+    }
+
+    .profile-info {
+      text-align: left;
+    }
+
+    .profile-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin: 0;
+    }
+
+    .profile-tier {
+      font-size: 0.75rem;
+      opacity: 0.6;
+      margin: 0;
+    }
+
+    /* Grid Layout */
+    .db-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    @media (max-width: 1024px) {
+      .db-grid {
+        grid-template-columns: 1fr;
+      }
+      .db-wrapper {
+        padding: 1.5rem;
+      }
+    }
+
+    /* Status Pill / Alert Banner */
+    .crm-status-banner {
+      grid-column: 1 / -1;
+      background: linear-gradient(90deg, rgba(215, 111, 48, 0.15) 0%, rgba(204, 164, 59, 0.05) 100%);
+      border-left: 4px solid var(--color-terracotta);
+      border-radius: 8px;
+      padding: 1.25rem 1.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .crm-status-text {
+      font-size: 0.95rem;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .countdown-highlight {
+      font-weight: 800;
+      color: var(--color-terracotta);
+    }
+
+    .referral-container {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 6px;
+      padding: 0.5rem 0.85rem;
+    }
+
+    .referral-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      opacity: 0.5;
+    }
+
+    .referral-url {
+      font-family: monospace;
+      font-size: 0.85rem;
+      color: var(--color-accent-gold);
+    }
+
+    .btn-copy {
+      background: transparent;
+      border: none;
+      color: var(--color-white);
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.2s, transform 0.2s;
+      padding: 0;
+      font-size: 1rem;
+    }
+
+    .btn-copy:hover {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+
+    /* KPI Cards row */
+    .kpi-row {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .kpi-card {
+      background-color: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 1.75rem;
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: var(--color-accent-gold);
+      opacity: 0.2;
+    }
+
+    .kpi-card.highlight-kpi::before {
+      background: var(--color-terracotta);
+      opacity: 0.7;
+    }
+
+    .kpi-title {
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: rgba(244, 241, 234, 0.5);
+      margin: 0 0 0.5rem;
+    }
+
+    .kpi-value {
+      font-family: 'Oswald', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin: 0 0 0.75rem;
+      color: var(--color-white);
+    }
+
+    .kpi-meta {
+      font-size: 0.75rem;
+      opacity: 0.7;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .kpi-trend-up {
+      color: #5bb85c;
+      font-weight: 700;
+    }
+
+    /* Progress bar */
+    .kpi-progress-container {
+      width: 100%;
+      height: 6px;
+      background-color: rgba(255, 255, 255, 0.08);
+      border-radius: 3px;
+      margin-top: 0.75rem;
+      overflow: hidden;
+    }
+
+    .kpi-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--color-terracotta) 0%, var(--color-accent-gold) 100%);
+      border-radius: 3px;
+      transition: width 0.5s ease;
+    }
+
+    /* Main Left Section Panels */
+    .db-panel {
+      background-color: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 2.25rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.75rem;
+    }
+
+    .panel-title {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin: 0;
+      color: var(--color-white);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .panel-icon {
+      color: var(--color-terracotta);
+    }
+
+    /* Form Fields */
+    .store-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+
+    @media (max-width: 600px) {
+      .store-form {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      text-align: left;
+    }
+
+    .form-group.span-2 {
+      grid-column: span 2;
+    }
+
+    @media (max-width: 600px) {
+      .form-group.span-2 {
+        grid-column: span 1;
+      }
+    }
+
+    .form-group label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: rgba(244, 241, 234, 0.6);
+    }
+
+    .store-form input, .store-form select {
+      background-color: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 0.8rem 1rem;
+      color: var(--color-white);
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.3s;
+    }
+
+    .store-form input:focus, .store-form select:focus {
+      border-color: var(--color-terracotta);
+      box-shadow: 0 0 0 3px rgba(215, 111, 48, 0.15);
+    }
+
+    .btn-form-submit {
+      grid-column: span 2;
+      background: linear-gradient(135deg, var(--color-terracotta) 0%, #b8501e 100%);
+      color: var(--color-white);
+      border: none;
+      border-radius: 8px;
+      padding: 1rem 2rem;
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(215, 111, 48, 0.3);
+      transition: all 0.3s ease;
+      margin-top: 0.5rem;
+    }
+
+    @media (max-width: 600px) {
+      .btn-form-submit {
+        grid-column: span 1;
+      }
+    }
+
+    .btn-form-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(215, 111, 48, 0.5);
+    }
+
+    /* Active Ledger Table */
+    .ledger-table-container {
+      overflow-x: auto;
+      margin: 0 -2.25rem -2.25rem;
+    }
+
+    .ledger-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    .ledger-table th {
+      background-color: rgba(255, 255, 255, 0.015);
+      border-bottom: 2px solid rgba(255, 255, 255, 0.06);
+      padding: 1rem 2.25rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 1px;
+      color: rgba(244, 241, 234, 0.5);
+    }
+
+    .ledger-table td {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      padding: 1.1rem 2.25rem;
+      color: var(--color-white);
+      vertical-align: middle;
+    }
+
+    .ledger-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .store-badge-type {
+      font-size: 0.72rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 600;
+      text-transform: uppercase;
+      background-color: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      display: inline-block;
+    }
+
+    .badge-status {
+      font-size: 0.72rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .badge-status.status-active {
+      background-color: rgba(91, 184, 92, 0.12);
+      border: 1px solid #5bb85c;
+      color: #5bb85c;
+    }
+
+    .badge-status.status-trial {
+      background-color: rgba(204, 164, 59, 0.12);
+      border: 1px solid var(--color-accent-gold);
+      color: var(--color-accent-gold);
+    }
+
+    /* Pitch script drawer */
+    .pitch-drawer {
+      background-color: rgba(204, 164, 59, 0.03);
+      border: 1px solid rgba(204, 164, 59, 0.15);
+      border-radius: 12px;
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 2rem;
+      text-align: left;
+    }
+
+    .pitch-drawer:hover {
+      background-color: rgba(204, 164, 59, 0.06);
+      border-color: var(--color-accent-gold);
+    }
+
+    .pitch-drawer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .pitch-drawer-title {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--color-accent-gold);
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .pitch-drawer-toggle {
+      font-size: 1.2rem;
+      color: var(--color-accent-gold);
+      transition: transform 0.3s;
+    }
+
+    .pitch-content {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s, margin-top 0.3s;
+    }
+
+    .pitch-content.active {
+      max-height: 500px;
+      opacity: 1;
+      margin-top: 1.25rem;
+      border-top: 1px solid rgba(204, 164, 59, 0.15);
+      padding-top: 1rem;
+    }
+
+    .pitch-step {
+      margin-bottom: 1.25rem;
+    }
+
+    .pitch-step:last-child {
+      margin-bottom: 0;
+    }
+
+    .pitch-step-title {
+      font-size: 0.82rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--color-terracotta);
+      margin: 0 0 0.35rem;
+      letter-spacing: 0.5px;
+    }
+
+    .pitch-quote {
+      font-style: italic;
+      font-family: 'Georgia', serif;
+      font-size: 0.95rem;
+      color: var(--color-text-cream);
+      margin: 0;
+      background: rgba(0, 0, 0, 0.15);
+      padding: 0.6rem 1rem;
+      border-left: 2px solid var(--color-terracotta);
+      border-radius: 0 6px 6px 0;
+      line-height: 1.4;
+    }
+
+    /* Simulation Panel (Right Column) */
+    .milestone-tracker {
+      background-color: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: left;
+    }
+
+    .milestone-title {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin: 0 0 1.25rem;
+      color: var(--color-white);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding-bottom: 0.75rem;
+    }
+
+    .milestone-requirement {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .milestone-req-label {
+      opacity: 0.7;
+    }
+
+    .milestone-req-val {
+      color: var(--color-accent-gold);
+    }
+
+    .sim-slider-group {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .sim-slider-label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+
+    .sim-slider-val {
+      color: var(--color-terracotta);
+    }
+
+    .sim-slider {
+      width: 100%;
+      height: 6px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 3px;
+      outline: none;
+      -webkit-appearance: none;
+      margin-bottom: 1.5rem;
+    }
+
+    .sim-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--color-terracotta);
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(215, 111, 48, 0.6);
+      transition: transform 0.1s;
+    }
+
+    .sim-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    .sim-result-card {
+      background: linear-gradient(135deg, rgba(215, 111, 48, 0.08) 0%, rgba(204, 164, 59, 0.04) 100%);
+      border: 1px solid rgba(215, 111, 48, 0.25);
+      border-radius: 8px;
+      padding: 1.25rem;
+      text-align: center;
+    }
+
+    .sim-result-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      opacity: 0.6;
+      margin: 0 0 0.5rem;
+    }
+
+    .sim-result-value {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--color-terracotta);
+      margin: 0;
+    }
+
+    .rules-card {
+      background: rgba(255, 255, 255, 0.015);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-top: 1.5rem;
+      font-size: 0.8rem;
+      line-height: 1.45;
+      opacity: 0.85;
+    }
+
+    .rules-card h4 {
+      font-family: 'Oswald', sans-serif;
+      text-transform: uppercase;
+      margin: 0 0 0.5rem;
+      color: var(--color-white);
+      letter-spacing: 0.5px;
+    }
+
+    .rules-card ul {
+      margin: 0;
+      padding-left: 1.2rem;
+    }
+
+    .rules-card li {
+      margin-bottom: 0.4rem;
+    }
+
+    .rules-card li:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Modal success pop-up */
+    .modal-success-overlay {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.75);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      padding: 1rem;
+    }
+
+    .modal-success-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-success-card {
+      background-color: var(--color-modal-bg);
+      border: 2px solid var(--color-terracotta);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 480px;
+      padding: 2.5rem;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      transform: translateY(-20px);
+      transition: transform 0.3s ease;
+    }
+
+    .modal-success-overlay.active .modal-success-card {
+      transform: translateY(0);
+    }
+
+    .modal-success-close {
+      background-color: var(--color-white);
+      color: var(--color-base);
+      border: none;
+      border-radius: 6px;
+      padding: 0.8rem 2rem;
+      font-family: 'Oswald', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-top: 1.5rem;
+      transition: background-color 0.25s, color 0.25s;
+    }
+
+    .modal-success-close:hover {
+      background-color: var(--color-terracotta);
+      color: var(--color-white);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="db-wrapper">
+    <!-- Top Nav Header -->
+    <header class="db-header">
+      <div class="db-logo-section">
+        <h1 class="db-logo">PretzelSticksPapis</h1>
+        <span class="db-badge-rank">Gen 1 Closer</span>
+      </div>
+      <div class="profile-card">
+        <div class="avatar">JC</div>
+        <div class="profile-info">
+          <h4 class="profile-name">Jose Closer</h4>
+          <p class="profile-tier">Sales Representative</p>
+        </div>
+      </div>
+    </header>
+
+    <div class="db-grid">
+      <!-- CRM Activity Rule alert and Referral banner -->
+      <div class="crm-status-banner">
+        <p class="crm-status-text">
+          ⚠️ <span class="countdown-highlight">CRM Alert:</span> You have <span class="countdown-highlight">45 Days</span> remaining to register a new trial to keep your account active under the 60-day CRM rule.
+        </p>
+        <div class="referral-container">
+          <span class="referral-label">Referral Link:</span>
+          <span class="referral-url" id="ref-url">http://localhost:5173/register?ref=josepapi</span>
+          <button class="btn-copy" id="btn-copy-ref" title="Copy Invitation Link">📋</button>
+        </div>
+      </div>
+
+      <!-- KPI Analytics Row -->
+      <div class="kpi-row">
+        <div class="kpi-card highlight-kpi">
+          <h3 class="kpi-title">Active Accounts</h3>
+          <div class="kpi-value" id="kpi-stores">7 <span style="font-size: 1.2rem; font-family: sans-serif; font-weight: normal; opacity: 0.5;">/ 10</span></div>
+          <p class="kpi-meta">
+            <span class="kpi-trend-up">★ 70%</span> of Level 2 milestone
+          </p>
+          <div class="kpi-progress-container">
+            <div class="kpi-progress-bar" id="progress-stores" style="width: 70%;"></div>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <h3 class="kpi-title">Monthly Gross Sales</h3>
+          <div class="kpi-value" id="kpi-sales">$1,560.00</div>
+          <p class="kpi-meta">
+            <span class="kpi-trend-up">★ 78%</span> of Level 2 milestone ($2,000)
+          </p>
+          <div class="kpi-progress-container">
+            <div class="kpi-progress-bar" id="progress-sales" style="width: 78%;"></div>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <h3 class="kpi-title">Personal Commission Rate</h3>
+          <div class="kpi-value">12%</div>
+          <p class="kpi-meta">Direct commissions on local store orders</p>
+        </div>
+
+        <div class="kpi-card">
+          <h3 class="kpi-title">Recurring Monthly Commission</h3>
+          <div class="kpi-value" id="kpi-commissions">$187.20</div>
+          <p class="kpi-meta">Residual passive revenue this month</p>
+        </div>
+      </div>
+
+      <!-- Main Left Column -->
+      <div class="db-left-col">
+        <!-- Interactive 3-Minute Script Drawer -->
+        <div class="pitch-drawer" id="pitch-drawer">
+          <div class="pitch-drawer-header">
+            <h3 class="pitch-drawer-title">💡 Open Interactive 3-Minute Field Script</h3>
+            <span class="pitch-drawer-toggle" id="pitch-toggle">▶</span>
+          </div>
+          <div class="pitch-content" id="pitch-content">
+            <div class="pitch-step">
+              <h4 class="pitch-step-title">Step 1: The Hook (Cost Zero)</h4>
+              <p class="pitch-quote">"Hey, I represent PretzelSticksPapis. We are placing free sample display stands in local stores this week. We handle all logistics, and it's a $0 risk trial. If it sells, you keep the profits. If not, we take it back. No cost."</p>
+            </div>
+            <div class="pitch-step">
+              <h4 class="pitch-step-title">Step 2: The Automations (Stripe & AI)</h4>
+              <p class="pitch-quote">"Once the stand is in, our systems track your inventory automatically. A Voice AI will call you to manage re-supplies on a 21-day cycle, making it zero effort on your end."</p>
+            </div>
+            <div class="pitch-step">
+              <h4 class="pitch-step-title">Step 3: Registration</h4>
+              <p class="pitch-quote">"I just need your shop info to register the trial on Stripe. You will receive an invoice showing $0.00 to confirm setup. Let's do it."</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Register Store (B2B Lead Creation Form) -->
+        <div class="db-panel">
+          <div class="panel-header">
+            <h3 class="panel-title"><span class="panel-icon">🏪</span> Register Local Store ($0 Trial)</h3>
+          </div>
+          <form class="store-form" id="register-store-form">
+            <div class="form-group">
+              <label for="store-name">Store Name</label>
+              <input type="text" id="store-name" placeholder="e.g. Broadway Convenience" required />
+            </div>
+            <div class="form-group">
+              <label for="owner-name">Owner / Manager Name</label>
+              <input type="text" id="owner-name" placeholder="e.g. Michael Smith" required />
+            </div>
+            <div class="form-group">
+              <label for="store-type">Store Category / Size</label>
+              <select id="store-type" required>
+                <option value="medium">Convenience Store / Gas Station ($390/mo)</option>
+                <option value="low">Corner Café / Coffee Shop ($195/mo)</option>
+                <option value="high">Supermarket / Special Account ($780/mo)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="store-phone">Store Phone Number</label>
+              <input type="tel" id="store-phone" placeholder="(555) 555-5555" required />
+            </div>
+            <div class="form-group span-2">
+              <label for="store-address">Physical Address</label>
+              <input type="text" id="store-address" placeholder="123 Main St, New York, NY" required />
+            </div>
+            <button type="submit" class="btn-form-submit">Activate $0 trial in Stripe</button>
+          </form>
+        </div>
+
+        <!-- Ledger Table of Active Stores -->
+        <div class="db-panel">
+          <div class="panel-header">
+            <h3 class="panel-title"><span class="panel-icon">📋</span> Active Accounts Ledger</h3>
+          </div>
+          <div class="ledger-table-container">
+            <table class="ledger-table" id="ledger-table">
+              <thead>
+                <tr>
+                  <th>Store Name</th>
+                  <th>Category</th>
+                  <th>Monthly Sales</th>
+                  <th>Your Commission</th>
+                  <th>Stripe Status</th>
+                </tr>
+              </thead>
+              <tbody id="ledger-body">
+                <!-- Initial 7 stores loaded dynamically in JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column Panels -->
+      <div class="db-right-col">
+        <!-- Level 2 Promition Tracking Panel -->
+        <div class="milestone-tracker">
+          <h3 class="milestone-title">Level 2 (Team Lead) Milestones</h3>
+          
+          <div class="milestone-requirement">
+            <span class="milestone-req-label">Active Stores:</span>
+            <span class="milestone-req-val" id="progress-stores-text">7 / 10 Stores</span>
+          </div>
+          <div class="kpi-progress-container" style="margin-bottom: 1.5rem;">
+            <div class="kpi-progress-bar" id="sidebar-progress-stores" style="width: 70%;"></div>
+          </div>
+
+          <div class="milestone-requirement">
+            <span class="milestone-req-label">Monthly Volume:</span>
+            <span class="milestone-req-val" id="progress-sales-text">$1,560 / $2,000</span>
+          </div>
+          <div class="kpi-progress-container" style="margin-bottom: 2rem;">
+            <div class="kpi-progress-bar" id="sidebar-progress-sales" style="width: 78%;"></div>
+          </div>
+
+          <!-- Network Override Simulator -->
+          <div class="sim-slider-group">
+            <h4 class="sim-slider-label">
+              <span>Level 2 Override Simulator</span>
+              <span class="sim-slider-val" id="slider-val">$0</span>
+            </h4>
+            <p style="font-size: 0.75rem; opacity: 0.6; margin-top: -0.5rem; margin-bottom: 1rem;">
+              Simulate earning a 5% override commission on the sales volume of agents you recruit.
+            </p>
+            <input type="range" class="sim-slider" id="sim-slider-input" min="0" max="10000" step="500" value="0" />
+            
+            <div class="sim-result-card">
+              <h5 class="sim-result-title">Projected Override Commission</h5>
+              <div class="sim-result-value" id="override-earnings">$0.00</div>
+              <p style="font-size: 0.72rem; opacity: 0.7; margin: 0.5rem 0 0;">
+                Calculated at a 5% override tier on Gen 1 team volume.
+              </p>
+            </div>
+          </div>
+
+          <!-- Meritocracy Rules Summary -->
+          <div class="rules-card">
+            <h4>PSP Sales Meritocracy Rules</h4>
+            <ul>
+              <li><strong>Leapfrogging Active:</strong> Reclaimers/recruits can rank past their sponsor if they hit targets first.</li>
+              <li><strong>Zero Parasitic Revenue:</strong> Sponsoring agents must maintain at least 10 direct active stores to unlock overrides.</li>
+              <li><strong>Automatic Roll-Up:</strong> If you are inactive for 60 days, overrides bypass you to the next active Leader.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stripe Success Modal Popup -->
+  <div class="modal-success-overlay" id="stripe-success-modal">
+    <div class="modal-success-card">
+      <div class="success-icon" style="margin: 0 auto 1.5rem;">✓</div>
+      <h2 class="success-title" style="margin-bottom: 0.5rem;">Stripe Trial Activated!</h2>
+      <p style="font-size: 0.95rem; opacity: 0.8; margin-bottom: 1.5rem;" id="modal-success-desc"></p>
+      
+      <div style="background-color: rgba(0,0,0,0.25); border: 1px dashed rgba(255,255,255,0.15); padding: 1rem; border-radius: 6px; text-align: left; font-size: 0.8rem; line-height: 1.6; margin-bottom: 1rem;">
+        <div><strong>Stripe Reference:</strong> <span style="color: var(--color-accent-gold); font-family: monospace;" id="stripe-ref"></span></div>
+        <div><strong>Trial Cost:</strong> <span style="color: #5bb85c; font-weight: bold;">$0.00 USD</span></div>
+        <div><strong>Logistics Code:</strong> <span style="font-family: monospace;" id="logistics-code"></span></div>
+        <div><strong>Billing Cycle:</strong> 21-day Automatic voice AI replenishment</div>
+      </div>
+      <button class="modal-success-close" id="btn-close-success">Done</button>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // ── Elements ──────────────────────────────────────────────────────────
+      const pitchDrawer = document.getElementById('pitch-drawer');
+      const pitchContent = document.getElementById('pitch-content');
+      const pitchToggle = document.getElementById('pitch-toggle');
+      const btnCopyRef = document.getElementById('btn-copy-ref');
+      const refUrl = document.getElementById('ref-url');
+      const registerForm = document.getElementById('register-store-form');
+      const ledgerBody = document.getElementById('ledger-body');
+      
+      // KPI values
+      const kpiStores = document.getElementById('kpi-stores');
+      const kpiSales = document.getElementById('kpi-sales');
+      const kpiCommissions = document.getElementById('kpi-commissions');
+      const progressStores = document.getElementById('progress-stores');
+      const progressSales = document.getElementById('progress-sales');
+      const sidebarProgressStores = document.getElementById('sidebar-progress-stores');
+      const sidebarProgressSales = document.getElementById('sidebar-progress-sales');
+      const progressStoresText = document.getElementById('progress-stores-text');
+      const progressSalesText = document.getElementById('progress-sales-text');
+
+      // Success Modal
+      const successModal = document.getElementById('stripe-success-modal');
+      const modalSuccessDesc = document.getElementById('modal-success-desc');
+      const stripeRef = document.getElementById('stripe-ref');
+      const logisticsCode = document.getElementById('logistics-code');
+      const btnCloseSuccess = document.getElementById('btn-close-success');
+
+      // Override Simulator
+      const simSlider = document.getElementById('sim-slider-input');
+      const sliderValText = document.getElementById('slider-val');
+      const overrideEarningsText = document.getElementById('override-earnings');
+
+      // ── Data State ────────────────────────────────────────────────────────
+      let currentActiveCount = 5; // 5 active, 2 trials initially
+      let currentTotalCount = 7;
+      let currentSales = 1560.00;
+      let currentCommissions = 187.20;
+
+      // Initial stores ledger
+      const stores = [
+        { name: 'Sinammon Corner Café', type: 'low', sales: 195, commission: 23.40, status: 'active' },
+        { name: 'Shell Express Gas Station', type: 'medium', sales: 390, commission: 46.80, status: 'active' },
+        { name: 'Pretzel & Co. Bakery', type: 'medium', sales: 390, commission: 46.80, status: 'active' },
+        { name: 'Mini-Market Broadway', type: 'medium', sales: 390, commission: 46.80, status: 'active' },
+        { name: 'Canyon Road Bistro', type: 'low', sales: 195, commission: 23.40, status: 'active' },
+        { name: 'Daily Fresh Bodega', type: 'medium', sales: 390, commission: 0.00, status: 'trial' },
+        { name: 'Highway 66 QuikStop', type: 'medium', sales: 390, commission: 0.00, status: 'trial' }
+      ];
+
+      // Render stores
+      function renderLedger() {
+        ledgerBody.innerHTML = '';
+        stores.forEach(store => {
+          const tr = document.createElement('tr');
+          
+          // Format type label
+          const typeLabel = store.type === 'low' ? 'Café' : store.type === 'medium' ? 'Convenience' : 'Supermarket';
+          
+          // Format status badge
+          const statusBadge = store.status === 'active' 
+            ? `<span class="badge-status status-active">● Active</span>`
+            : `<span class="badge-status status-trial">⏱ Trial</span>`;
+
+          tr.innerHTML = `
+            <td><strong>${store.name}</strong></td>
+            <td><span class="store-badge-type">${typeLabel}</span></td>
+            <td>$${store.sales.toFixed(2)}</td>
+            <td style="color: var(--color-accent-gold); font-weight: 600;">$${store.commission.toFixed(2)}</td>
+            <td>${statusBadge}</td>
+          `;
+          ledgerBody.appendChild(tr);
+        });
+      }
+      renderLedger();
+
+      // ── Pitch Drawer Toggle ────────────────────────────────────────────────
+      pitchDrawer.addEventListener('click', (e) => {
+        // Prevent trigger if clicking inside the script text (so people can copy)
+        if (e.target.closest('.pitch-quote') || e.target.closest('.pitch-step-title')) return;
+        
+        const active = pitchContent.classList.toggle('active');
+        pitchToggle.style.transform = active ? 'rotate(90deg)' : 'rotate(0deg)';
+        pitchToggle.textContent = active ? '▼' : '▶';
+      });
+
+      // ── Copy Referral Link ─────────────────────────────────────────────────
+      btnCopyRef.addEventListener('click', () => {
+        navigator.clipboard.writeText(refUrl.textContent).then(() => {
+          btnCopyRef.textContent = '✓';
+          setTimeout(() => {
+            btnCopyRef.textContent = '📋';
+          }, 1500);
+        });
+      });
+
+      // ── Store Registration Submission ──────────────────────────────────────
+      registerForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const sName = document.getElementById('store-name').value;
+        const sOwner = document.getElementById('owner-name').value;
+        const sType = document.getElementById('store-type').value;
+
+        // Calculate metrics
+        const sSales = sType === 'low' ? 195 : sType === 'medium' ? 390 : 780;
+        
+        // Add new store as "Trial" status initially (commission is $0 during trial)
+        const newStore = {
+          name: sName,
+          type: sType,
+          sales: sSales,
+          commission: 0.00, // $0 commission during B2B trial phase
+          status: 'trial'
+        };
+
+        stores.unshift(newStore);
+        renderLedger();
+
+        // Increment overall stores count
+        currentTotalCount += 1;
+
+        // Update KPIs
+        updateKPIs();
+
+        // Generate Stripe keys
+        const randomRef = 'ch_' + Math.random().toString(36).substring(2, 10).toUpperCase();
+        const randomCode = 'PSP-' + Math.random().toString(36).substring(2, 7).toUpperCase();
+
+        // Open Success Modal
+        modalSuccessDesc.textContent = `A $0.00 trial invoice has been generated for ${sName}. A display stand logistics dispatch has been flagged for ${sOwner}.`;
+        stripeRef.textContent = randomRef;
+        logisticsCode.textContent = randomCode;
+
+        successModal.classList.add('active');
+
+        // Reset form
+        registerForm.reset();
+      });
+
+      btnCloseSuccess.addEventListener('click', () => {
+        successModal.classList.remove('active');
+      });
+
+      // Close modal on click background
+      successModal.addEventListener('click', (e) => {
+        if (e.target === successModal) successModal.classList.remove('active');
+      });
+
+      function updateKPIs() {
+        // Active stores display
+        kpiStores.innerHTML = `${currentTotalCount} <span style="font-size: 1.2rem; font-family: sans-serif; font-weight: normal; opacity: 0.5;">/ 10</span>`;
+        progressStoresText.textContent = `${currentTotalCount} / 10 Stores`;
+
+        // Calculate progress bars
+        const storeProgress = Math.min(100, (currentTotalCount / 10) * 100);
+        progressStores.style.width = `${storeProgress}%`;
+        sidebarProgressStores.style.width = `${storeProgress}%`;
+
+        // Update progress badge text
+        const badge = document.querySelector('.kpi-card:nth-child(1) .kpi-trend-up');
+        badge.textContent = `★ ${Math.round(storeProgress)}%`;
+      }
+
+      // ── Commission Override Simulator ──────────────────────────────────────
+      simSlider.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value);
+        sliderValText.textContent = `$${val.toLocaleString()}`;
+        
+        // 5% override comission
+        const override = val * 0.05;
+        overrideEarningsText.textContent = `$${override.toFixed(2)}`;
+      });
+    });
+  </script>
+</body>
+</html>
