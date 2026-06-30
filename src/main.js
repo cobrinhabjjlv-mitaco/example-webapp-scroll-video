@@ -49,6 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let animationTriggered  = false;     // true after modal is dismissed
   let upwardOnlyActive    = false;     // true after reaching stop
   let phase1Stop          = 1480;      // dynamic stop point in scroll px (default fallback)
+  let scrollableDistance  = 0;         // total scroll range shared with handlers
+  let ctaDismissed        = false;     // true once "I Want It" is clicked to trigger flyaway
 
   // ── Lock scroll initially (lead modal flow) ───────────────────────────────
   document.body.style.overflow = 'hidden';
@@ -294,6 +296,39 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // ── "I Want It" Button click handler (Phase 2 Auto-scroll) ────────────────
+  const btnWantIt = document.getElementById('btn-want-it');
+  if (btnWantIt) {
+    btnWantIt.addEventListener('click', () => {
+      // 1. Permanently dismiss overlay in render loops
+      ctaDismissed = true;
+
+      // 2. Trigger the 0.4s fly-away CSS animation
+      if (ctaOverlay) {
+        ctaOverlay.classList.add('cta-fly-away');
+        setTimeout(() => {
+          ctaOverlay.style.display = 'none';
+        }, 400);
+      }
+
+      // 3. Disable clamp-to-stop scroll behavior
+      upwardOnlyActive = false;
+
+      // 4. Lock page scroll during the second animation phase
+      document.body.style.overflow = 'hidden';
+
+      // 5. Cancel any running scroll animation
+      if (cancelCurrentScroll) cancelCurrentScroll();
+
+      // 6. Scroll all the way to the end (bottom of the page)
+      autoScrollSegment(window.scrollY, scrollableDistance, 3000, () => {
+        console.log('Reached bottom of the page. Displaying signup modal.');
+        // 7. Open the sign-up modal
+        openAuthModal(signupModal);
+      });
+    });
+  }
+
   // ============================================================
   // Scroll-bound video animation logic
   // ============================================================
@@ -333,7 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const frames = [];
     let N = 0, iw = 0, ih = 0, drawn = -1;
     let spacerHeight = 0;
-    let scrollableDistance = 0;
+    scrollableDistance = 0;
 
     function syncSpacerHeight() {
       const computed = window.innerHeight * 5;
@@ -383,7 +418,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (i !== drawn) draw(i);
 
       // Trigger CTA overlay when scroll is close to phase1Stop (video 4.5s)
-      if (animationTriggered) {
+      if (animationTriggered && !ctaDismissed) {
         if (scrollTop >= phase1Stop - 15) {
           showCtaOverlay();
         } else {

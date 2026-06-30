@@ -735,3 +735,16 @@ body {
 .btn-want-it:active {
   transform: translateY(0);
 }
+
+/* Fly away downward transition */
+.cta-overlay.cta-fly-away {
+  opacity: 0 !important;
+  transition: opacity 0.4s ease !important;
+  pointer-events: none !important;
+}
+
+.cta-overlay.cta-fly-away .cta-card {
+  transform: translateY(150px) !important;
+  opacity: 0 !important;
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1) !important, opacity 0.4s ease !important;
+}
