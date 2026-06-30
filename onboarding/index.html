@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PretzelSticksPapis — Partner Onboarding</title>
+  <link rel="stylesheet" href="/src/style.css" />
+  <style>
+    body {
+      background-color: var(--color-base);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 2rem 1rem;
+      font-family: 'Inter', sans-serif;
+      color: var(--color-text-cream);
+    }
+
+    .onboarding-container {
+      width: 100%;
+      max-width: 580px;
+      background-color: var(--color-modal-bg);
+      border: 2px solid var(--color-terracotta);
+      border-radius: 16px;
+      padding: 3rem 2.5rem;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.5s ease;
+    }
+
+    .onboarding-title {
+      font-family: 'Oswald', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--color-terracotta);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+    }
+
+    .onboarding-subtitle {
+      font-size: 0.95rem;
+      color: var(--color-text-cream);
+      opacity: 0.8;
+      margin-bottom: 2.5rem;
+      line-height: 1.5;
+    }
+
+    /* Selection Cards */
+    .selection-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 480px) {
+      .selection-grid {
+        grid-template-columns: 1fr;
+      }
+      .onboarding-container {
+        padding: 2rem 1.5rem;
+      }
+    }
+
+    .selection-card {
+      background-color: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 1.5rem 1.25rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      position: relative;
+    }
+
+    .selection-card:hover {
+      background-color: rgba(255, 255, 255, 0.06);
+      border-color: rgba(215, 111, 48, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .selection-card.selected {
+      background-color: rgba(215, 111, 48, 0.08);
+      border-color: var(--color-terracotta);
+      box-shadow: 0 0 15px rgba(215, 111, 48, 0.15);
+    }
+
+    .card-icon {
+      font-size: 2rem;
+      color: var(--color-text-cream);
+      transition: color 0.3s;
+    }
+
+    .selection-card.selected .card-icon {
+      color: var(--color-terracotta);
+    }
+
+    .card-label {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin: 0;
+    }
+
+    .card-desc {
+      font-size: 0.75rem;
+      opacity: 0.6;
+      line-height: 1.4;
+      margin: 0;
+    }
+
+    /* Hidden inputs & sliding elements */
+    .slide-down-field {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+    }
+
+    .slide-down-field.active {
+      max-height: 150px;
+      opacity: 1;
+      margin-bottom: 2rem;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+      width: 100%;
+    }
+
+    .input-group label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: rgba(244, 241, 234, 0.7);
+    }
+
+    .input-group input {
+      width: 100%;
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      color: var(--color-white);
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .input-group input:focus {
+      border-color: var(--color-terracotta);
+      box-shadow: 0 0 0 3px rgba(215, 111, 48, 0.15);
+    }
+
+    .btn-submit {
+      background: linear-gradient(135deg, var(--color-terracotta) 0%, #b8501e 100%);
+      color: var(--color-white);
+      border: none;
+      border-radius: 8px;
+      padding: 1.1rem 2rem;
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      width: 100%;
+      box-shadow: 0 4px 16px rgba(215, 111, 48, 0.3);
+      transition: all 0.3s ease;
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .btn-submit.ready {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .btn-submit.ready:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(215, 111, 48, 0.5);
+    }
+
+    /* Success / Result State */
+    .success-view {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 1rem 0;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .success-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background-color: rgba(215, 111, 48, 0.1);
+      border: 3px solid var(--color-terracotta);
+      color: var(--color-terracotta);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      font-weight: bold;
+      animation: pulse-success 2s infinite;
+    }
+
+    .success-title {
+      font-family: 'Oswald', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin: 0;
+      color: var(--color-white);
+    }
+
+    .success-text {
+      font-size: 1rem;
+      opacity: 0.8;
+      margin: 0 0 1.5rem;
+      line-height: 1.5;
+    }
+
+    .btn-dashboard {
+      background-color: var(--color-white);
+      color: var(--color-base);
+      border: none;
+      border-radius: 8px;
+      padding: 1rem 2.5rem;
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-dashboard:hover {
+      background-color: var(--color-terracotta);
+      color: var(--color-white);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(215, 111, 48, 0.4);
+    }
+
+    @keyframes pulse-success {
+      0% { box-shadow: 0 0 0 0 rgba(215, 111, 48, 0.4); }
+      70% { box-shadow: 0 0 0 15px rgba(215, 111, 48, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(215, 111, 48, 0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="onboarding-container" id="onboarding-card">
+    <!-- Initial Form State -->
+    <div id="form-view">
+      <h1 class="onboarding-title">Partner Onboarding</h1>
+      <p class="onboarding-subtitle">Choose your partner account type and enter your authorization code to initialize onboarding.</p>
+
+      <div class="selection-grid">
+        <div class="selection-card" id="card-partner" data-type="channel-partner">
+          <div class="card-icon">🤝</div>
+          <h3 class="card-label">Channel Partner</h3>
+          <p class="card-desc">Distributors, representatives, and regional brokers</p>
+        </div>
+        <div class="selection-card" id="card-retail" data-type="retail-store">
+          <div class="card-icon">🏪</div>
+          <h3 class="card-label">Retail Store</h3>
+          <p class="card-desc">Physical storefronts, chains, and boutique markets</p>
+        </div>
+      </div>
+
+      <div class="slide-down-field" id="auth-code-container">
+        <div class="input-group">
+          <label for="auth-code">Authorization Code</label>
+          <input type="text" id="auth-code" placeholder="Enter authorization code..." autocomplete="off" />
+        </div>
+      </div>
+
+      <button id="btn-start-onboarding" class="btn-submit">Start Onboarding</button>
+    </div>
+
+    <!-- Success Result State -->
+    <div class="success-view" id="success-view">
+      <div class="success-icon">✓</div>
+      <h2 class="success-title">Onboarding Initialized</h2>
+      <p class="success-text">Your portal credentials have been generated under the selected tier. A confirmation has been sent to your email.</p>
+      <button class="btn-dashboard" onclick="window.location.href='/'">Go to Dashboard</button>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const cards = document.querySelectorAll('.selection-card');
+      const authContainer = document.getElementById('auth-code-container');
+      const authInput = document.getElementById('auth-code');
+      const btnStart = document.getElementById('btn-start-onboarding');
+      const formView = document.getElementById('form-view');
+      const successView = document.getElementById('success-view');
+      const cardContainer = document.getElementById('onboarding-card');
+
+      let selectedType = null;
+
+      // Handle card selections
+      cards.forEach(card => {
+        card.addEventListener('click', () => {
+          // Reset other cards
+          cards.forEach(c => c.classList.remove('selected'));
+          
+          card.classList.add('selected');
+          selectedType = card.dataset.type;
+
+          // Reveal auth code field
+          authContainer.classList.add('active');
+          authInput.focus();
+
+          checkFormReady();
+        });
+      });
+
+      // Enable start button on keyup
+      authInput.addEventListener('input', () => {
+        checkFormReady();
+      });
+
+      function checkFormReady() {
+        if (selectedType && authInput.value.trim().length > 0) {
+          btnStart.classList.add('ready');
+        } else {
+          btnStart.classList.remove('ready');
+        }
+      }
+
+      // Handle onboarding start submission (Mocking state change)
+      btnStart.addEventListener('click', () => {
+        if (!btnStart.classList.contains('ready')) return;
+
+        // Visual loading state on button
+        btnStart.textContent = 'Initializing...';
+        btnStart.disabled = true;
+
+        setTimeout(() => {
+          // Fade out form view
+          formView.style.transition = 'opacity 0.4s ease';
+          formView.style.opacity = '0';
+
+          setTimeout(() => {
+            formView.style.display = 'none';
+
+            // Show success view
+            successView.style.display = 'flex';
+            void successView.offsetWidth; // Force browser layout reflow
+            successView.style.opacity = '1';
+
+            // Optional: Glow border success transition
+            cardContainer.style.borderColor = '#CCA43B'; // Gold glow on success
+          }, 400);
+        }, 1200); // 1.2s mock initialization delay
+      });
+    });
+  </script>
+</body>
+</html>

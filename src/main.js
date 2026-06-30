@@ -263,8 +263,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('signup-form').addEventListener('submit', (e) => {
     e.preventDefault();
-    // TODO: wire up real auth
-    closeAuthModal(signupModal);
+    // Redirect to onboarding workflow page
+    window.location.href = '/onboarding';
   });
 
   // ── Switch between auth modals ────────────────────────────────────────────
