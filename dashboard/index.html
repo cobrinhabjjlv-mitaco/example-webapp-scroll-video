@@ -967,46 +967,78 @@
     <div class="modal-success-card" style="max-width: 600px;">
       <h2 class="success-title" style="margin-bottom: 0.5rem; color: var(--color-accent-gold);">B2B Partner Sales Model</h2>
       <p style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 1.5rem;">
-        Welcome to the team! Here is how our multi-tiered B2B distribution channel distributes wholesale orders.
+        Welcome to the team! Here is how our B2B distribution channel allocates commissions. Click each tier to view its upgrade milestones.
       </p>
 
       <!-- Visual Stacked Bar -->
       <div style="margin-bottom: 1.5rem;">
         <div style="font-size: 0.75rem; font-weight: bold; text-transform: uppercase; margin-bottom: 0.5rem; display: flex; justify-content: space-between; opacity: 0.8;">
-          <span>Wholesale Distribution Pool</span>
-          <span>$100.00 USD Sale</span>
+          <span>Distribution Tier Allocation</span>
+          <span>$20.00 Commission Pool / $100 order</span>
         </div>
         <div style="display: flex; height: 36px; border-radius: 6px; overflow: hidden; font-size: 0.75rem; font-weight: bold; color: #fff; line-height: 36px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">
-          <div style="width: 75%; background-color: rgba(255,255,255,0.15); color: rgba(255,255,255,0.6);" title="Manufacturer: $75">75%</div>
-          <div style="width: 12%; background-color: var(--color-terracotta);" title="You: $12">12%</div>
-          <div style="width: 5%; background-color: var(--color-accent-gold); color: #1c0f0b;" title="Leader: $5">5%</div>
-          <div style="width: 3%; background-color: #b8501e;" title="Director: $3">3%</div>
-          <div style="width: 5%; background-color: #4a90e2;" title="Tech: $5">5%</div>
+          <div style="width: 60%; background-color: var(--color-terracotta);" title="You: $12 (12%)">You (Gen 1): $12 (60%)</div>
+          <div style="width: 25%; background-color: var(--color-accent-gold); color: #1c0f0b;" title="Leader: $5 (5%)">Gen 2: $5 (25%)</div>
+          <div style="width: 15%; background-color: #b8501e;" title="Director: $3 (3%)">Gen 3: $3 (15%)</div>
         </div>
       </div>
 
-      <!-- Table breakdown of every $100 -->
+      <!-- Interactive Tiers Accordion -->
       <div style="text-align: left; font-size: 0.85rem; line-height: 1.5; margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
-        <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.06); background-color: rgba(215, 111, 48, 0.08); border-left: 3px solid var(--color-terracotta); border-radius: 0 4px 4px 0;">
-          <span><strong>Gen 1 Closer (You)</strong> — Direct sales commission</span>
-          <span style="color: var(--color-terracotta); font-weight: bold;">$12.00 (12%)</span>
+        
+        <!-- Gen 1 Tier -->
+        <div class="modal-tier-item" style="border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; overflow: hidden;">
+          <div class="modal-tier-header" style="display: flex; justify-content: space-between; padding: 0.75rem 1rem; background-color: rgba(215, 111, 48, 0.08); border-left: 4px solid var(--color-terracotta); cursor: pointer; user-select: none;" data-tier="1">
+            <span><strong>Gen 1 Closer (You)</strong> — Direct sales commission</span>
+            <span style="color: var(--color-terracotta); font-weight: bold;">$12.00 (12%) <span class="tier-arrow" style="display: inline-block; transition: transform 0.2s; margin-left: 0.35rem;">▶</span></span>
+          </div>
+          <div class="modal-tier-hitos" style="max-height: 0; opacity: 0; transition: all 0.3s ease; overflow: hidden; padding: 0 1rem; font-size: 0.8rem; background-color: rgba(0,0,0,0.15);">
+            <div style="padding: 0.85rem 0;">
+              <strong style="color: var(--color-terracotta); text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.5px;">Level 2 (Team Lead) Milestones:</strong>
+              <ul style="margin: 0.4rem 0 0; padding-left: 1.2rem;">
+                <li>Maintain at least <strong>10 active retail stores</strong> on Stripe.</li>
+                <li>Generate direct monthly sales of at least <strong>$2,000 USD</strong> for 2 consecutive months.</li>
+              </ul>
+            </div>
+          </div>
         </div>
-        <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.06);">
-          <span><strong>Gen 2 Team Leader</strong> — Sponsor/team override</span>
-          <span>$5.00 (5%)</span>
+
+        <!-- Gen 2 Tier -->
+        <div class="modal-tier-item" style="border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; overflow: hidden;">
+          <div class="modal-tier-header" style="display: flex; justify-content: space-between; padding: 0.75rem 1rem; background-color: rgba(204, 164, 59, 0.05); border-left: 4px solid var(--color-accent-gold); cursor: pointer; user-select: none;" data-tier="2">
+            <span><strong>Gen 2 Team Leader</strong> — Sponsor/team override</span>
+            <span style="color: var(--color-accent-gold); font-weight: bold;">$5.00 (5%) <span class="tier-arrow" style="display: inline-block; transition: transform 0.2s; margin-left: 0.35rem;">▶</span></span>
+          </div>
+          <div class="modal-tier-hitos" style="max-height: 0; opacity: 0; transition: all 0.3s ease; overflow: hidden; padding: 0 1rem; font-size: 0.8rem; background-color: rgba(0,0,0,0.15);">
+            <div style="padding: 0.85rem 0;">
+              <strong style="color: var(--color-accent-gold); text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.5px;">Level 3 (Director) Milestones:</strong>
+              <ul style="margin: 0.4rem 0 0; padding-left: 1.2rem;">
+                <li>Have <strong>3 personally recruited agents</strong> reach Gen 2 (Líder).</li>
+                <li>Maintain a total organization of at least <strong>50 active stores</strong>.</li>
+                <li>Reach a group monthly volume of at least <strong>$10,000 USD</strong> for 3 consecutive months.</li>
+              </ul>
+            </div>
+          </div>
         </div>
-        <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.06);">
-          <span><strong>Gen 3 Regional Director</strong> — Direct group override</span>
-          <span>$3.00 (3%)</span>
+
+        <!-- Gen 3 Tier -->
+        <div class="modal-tier-item" style="border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; overflow: hidden;">
+          <div class="modal-tier-header" style="display: flex; justify-content: space-between; padding: 0.75rem 1rem; background-color: rgba(184, 80, 30, 0.05); border-left: 4px solid #b8501e; cursor: pointer; user-select: none;" data-tier="3">
+            <span><strong>Gen 3 Regional Director</strong> — Group overrides</span>
+            <span style="color: #b8501e; font-weight: bold;">$3.00 (3%) <span class="tier-arrow" style="display: inline-block; transition: transform 0.2s; margin-left: 0.35rem;">▶</span></span>
+          </div>
+          <div class="modal-tier-hitos" style="max-height: 0; opacity: 0; transition: all 0.3s ease; overflow: hidden; padding: 0 1rem; font-size: 0.8rem; background-color: rgba(0,0,0,0.15);">
+            <div style="padding: 0.85rem 0;">
+              <strong style="color: #b8501e; text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.5px;">Ultimate Level Capabilities:</strong>
+              <ul style="margin: 0.4rem 0 0; padding-left: 1.2rem;">
+                <li>Earn direct 12% closer commissions on your accounts.</li>
+                <li>Collect <strong>5% indirect override</strong> on your Gen 2 team leader accounts.</li>
+                <li>Collect <strong>3% indirect override</strong> on all Gen 1 agent accounts.</li>
+              </ul>
+            </div>
+          </div>
         </div>
-        <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.06);">
-          <span><strong>Platform Technology (Vendor)</strong> — AI and Billing engine fee</span>
-          <span>$5.00 (5%)</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.06); opacity: 0.7;">
-          <span><strong>Product Owner (Manufacturer)</strong> — Manufacturing & Logistics</span>
-          <span>$75.00 (75%)</span>
-        </div>
+
       </div>
 
       <div style="font-size: 0.78rem; opacity: 0.7; margin-bottom: 1.5rem; text-align: left;">
@@ -1203,6 +1235,29 @@
         // 5% override comission
         const override = val * 0.05;
         overrideEarningsText.textContent = `$${override.toFixed(2)}`;
+      });
+
+      // ── Tier Accordion handlers ────────────────────────────────────────────
+      const tierHeaders = document.querySelectorAll('.modal-tier-header');
+      tierHeaders.forEach(header => {
+        header.addEventListener('click', () => {
+          const item = header.closest('.modal-tier-item');
+          const hitos = item.querySelector('.modal-tier-hitos');
+          const arrow = header.querySelector('.tier-arrow');
+          
+          const isOpen = hitos.classList.toggle('active-hitos');
+          if (isOpen) {
+            hitos.style.maxHeight = '200px';
+            hitos.style.opacity = '1';
+            hitos.style.padding = '0.5rem 1rem';
+            arrow.style.transform = 'rotate(90deg)';
+          } else {
+            hitos.style.maxHeight = '0';
+            hitos.style.opacity = '0';
+            hitos.style.padding = '0 1rem';
+            arrow.style.transform = 'rotate(0deg)';
+          }
+        });
       });
     });
   </script>
